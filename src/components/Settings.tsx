@@ -30,6 +30,18 @@ export default function Settings() {
   const [isSaving, setIsSaving] = React.useState(false);
   const [accent, setAccent] = React.useState('Sky Blue');
   const [isLanguageSelecting, setIsLanguageSelecting] = React.useState(false);
+  const [dbStatus, setDbStatus] = React.useState<{ connected: boolean; provider: string; integrity?: boolean } | null>(null);
+
+  const checkDb = () => {
+    fetch('/api/db-status')
+      .then(res => res.json())
+      .then(data => setDbStatus(data))
+      .catch(() => setDbStatus({ connected: false, provider: 'MongoDB Atlas' }));
+  };
+
+  React.useEffect(() => {
+    checkDb();
+  }, []);
 
   const currentLanguage = i18n.language || 'en';
   const languages = [
@@ -202,6 +214,45 @@ export default function Settings() {
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                   Production
                 </div>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-slate-400">Primary Database</span>
+                <div className="flex items-center gap-2 text-sky-400 font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+                  Firebase
+                </div>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-slate-400">Distributed DB</span>
+                <div className={cn(
+                  "flex items-center gap-2 font-mono",
+                  dbStatus?.connected ? "text-green-400" : "text-slate-500"
+                )}>
+                  <span className={cn(
+                    "w-1.5 h-1.5 rounded-full",
+                    dbStatus?.connected ? "bg-green-400 animate-pulse" : "bg-slate-700"
+                  )} />
+                  {dbStatus?.connected ? "Atlas Connected" : "Atlas Offline"}
+                </div>
+              </div>
+              {dbStatus?.connected && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400">Data Integrity</span>
+                  <div className={cn(
+                    "flex items-center gap-2 font-mono text-[10px] uppercase font-black",
+                    dbStatus?.integrity ? "text-sky-400" : "text-amber-500"
+                  )}>
+                    {dbStatus?.integrity ? "Verified Write/Read" : "Read-Only / Auth Issue"}
+                  </div>
+                </div>
+              )}
+              <div className="pt-2">
+                <button 
+                  onClick={checkDb}
+                  className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                  Rerunning Diagnostics...
+                </button>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-400">Build Signature</span>

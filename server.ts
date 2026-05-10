@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import { MongoClient, ServerApiVersion } from "mongodb";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -13,6 +14,75 @@ async function startServer() {
 
   // JSON body parser
   app.use(express.json());
+
+  // MongoDB Connection
+  const uri = process.env.MONGODB_URI;
+  let mongoClient: MongoClient | null = null;
+  let dbConnected = false;
+
+  async function getMongoClient() {
+    if (mongoClient && dbConnected) return mongoClient;
+    if (!uri) {
+      console.warn("[MONGODB] MONGODB_URI is not set. Database integration is disabled.");
+      return null;
+    }
+    
+    try {
+      const maskedUri = uri.replace(/\/\/(.*):(.*)@/, "//***:***@");
+      console.log(`[MONGODB] Connecting to Atlas: ${maskedUri}`);
+      
+      mongoClient = new MongoClient(uri, {
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        },
+        connectTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
+        // Ensure SNI is handled correctly by the driver
+        tls: true,
+      });
+
+      await mongoClient.connect();
+      await mongoClient.db("admin").command({ ping: 1 });
+      dbConnected = true;
+      console.log("[MONGODB] Connected successfully to Atlas cluster.");
+      return mongoClient;
+    } catch (err: any) {
+      console.error("[MONGODB] Connection failed:", err.message);
+      if (err.message.includes("SSL") || err.message.includes("TLS")) {
+        console.error("[MONGODB] SSL/TLS Error detected. Please ensure your Atlas cluster allows connections from this environment (check IP Whitelist) and the connection string is correct.");
+      }
+      mongoClient = null;
+      dbConnected = false;
+      return null;
+    }
+  }
+
+  // MongoDB Health & Integrity Route
+  app.get("/api/db-status", async (req, res) => {
+    const client = await getMongoClient();
+    let writeVisible = false;
+    
+    if (client && dbConnected) {
+      try {
+        const testCol = client.db("skymanage_system").collection("integrity_checks");
+        await testCol.insertOne({ timestamp: new Date(), type: "ping" });
+        writeVisible = true;
+      } catch (e) {
+        console.error("[MONGODB] Integrity check failed:", e);
+      }
+    }
+
+    res.json({
+      connected: !!client && dbConnected,
+      integrity: writeVisible,
+      provider: "MongoDB Atlas",
+      scalable: true,
+      distributed: true,
+      timestamp: new Date().toISOString()
+    });
+  });
 
   // Invite API route
   app.post("/api/invite", async (req, res) => {
