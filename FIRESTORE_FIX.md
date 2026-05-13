@@ -1,3 +1,19 @@
+# Firebase Firestore Permissions Fix
+
+## Issue
+The invitation system is failing with "Missing or insufficient permissions" errors because the Firestore security rules haven't been deployed yet.
+
+## Solution
+
+### Option 1: Deploy via Firebase Console (Recommended)
+
+1. **Go to Firebase Console**: https://console.firebase.google.com/
+2. **Select your project**: `gen-lang-client-0229470974`
+3. **Navigate to Firestore Database**: Click "Firestore Database" in the left menu
+4. **Go to Rules tab**: Click "Rules" tab at the top
+5. **Replace existing rules** with the following:
+
+```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -140,3 +156,34 @@ service cloud.firestore {
     }
   }
 }
+```
+
+6. **Click "Publish"** to deploy the rules
+
+### Option 2: Deploy via Firebase CLI
+
+1. **Install Firebase CLI** (already done)
+2. **Login to Firebase**: Run `firebase login` in terminal
+3. **Deploy rules**: Run `firebase deploy --only firestore:rules --project gen-lang-client-0229470974`
+
+## Current Status
+
+✅ **Backend**: Running successfully on localhost:3001  
+✅ **Frontend**: Connected to backend via proxy  
+✅ **Error Handling**: Added graceful fallbacks for permissions errors  
+⚠️ **Firestore Rules**: Need to be deployed (see solutions above)  
+
+## After Deployment
+
+Once rules are deployed:
+- Invitation system will work fully
+- Users can accept/decline invitations
+- Email notifications will be sent
+- All Firebase operations will be secured
+
+## Testing
+
+1. Send an invitation from Project Details page
+2. Check notification bell for new invitation
+3. Click invitation to open accept/decline screen
+4. Test both accept and decline actions

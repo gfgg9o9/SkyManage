@@ -1,0 +1,379 @@
+@startuml SkyManage Backend Services Class Diagram
+
+title SkyManage - Backend API and Services Class Diagram
+skinparam class {
+    BackgroundColor #LightYellow
+    BorderColor #DarkOrange
+    ArrowColor #DarkOrange
+}
+skinparam interface {
+    BackgroundColor #LightGreen
+    BorderColor #DarkGreen
+    ArrowColor #DarkGreen
+}
+skinparam package {
+    BackgroundColor #LightGray
+    BorderColor #Black
+}
+
+' Package Declarations
+package "Express Server" {
+    class Server
+    class APIRouter
+    class AuthMiddleware
+    class ErrorHandler
+    class CORSHandler
+}
+
+package "API Controllers" {
+    class InviteController
+    class UploadController
+    class NotificationController
+    class HealthController
+    class DatabaseController
+}
+
+package "Services" {
+    class EmailService
+    class S3Service
+    class AIService
+    class DatabaseService
+    class ValidationService
+}
+
+package "Database Layer" {
+    class MongoDBConnection
+    class FirestoreConnection
+    class DatabaseManager
+}
+
+package "External APIs" {
+    class ResendAPI
+    class AWSAPI
+    class GoogleAIAPI
+    class FirebaseAdminAPI
+}
+
+package "Middleware" {
+    class RequestLogger
+    class RateLimiter
+    class SecurityHeaders
+    class BodyParser
+}
+
+' Express Server Classes
+class Server {
+    -app: Express
+    -port: number
+    -mongoClient: MongoClient
+    -dbConnected: boolean
+    +start(): Promise<void>
+    +setupMiddleware(): void
+    +setupRoutes(): void
+    +handleError(error: Error): void
+    +gracefulShutdown(): void
+}
+
+class APIRouter {
+    -router: Router
+    +setupRoutes(): Router
+    +registerInviteRoutes(): void
+    +registerUploadRoutes(): void
+    +registerNotificationRoutes(): void
+    +registerHealthRoutes(): void
+}
+
+class AuthMiddleware {
+    -firebaseAdmin: FirebaseAdmin
+    +verifyToken(req: Request, res: Response, next: NextFunction): Promise<void>
+    +checkPermissions(permission: string): MiddlewareFunction
+    +extractUserFromToken(token: string): Promise<User>
+    +handleAuthError(error: AuthError): void
+}
+
+class ErrorHandler {
+    -logger: Logger
+    +handleError(error: Error, req: Request, res: Response): void
+    +logError(error: Error, context: RequestContext): void
+    +sendErrorResponse(res: Response, error: AppError): void
+    +isOperationalError(error: Error): boolean
+}
+
+class CORSHandler {
+    +handleCORS(req: Request, res: Response, next: NextFunction): void
+    +configureCORSOptions(): CORSOptions
+    +validateOrigin(origin: string): boolean
+}
+
+' API Controllers
+class InviteController {
+    -emailService: EmailService
+    -firestoreService: FirestoreService
+    +sendInvitation(req: Request, res: Response): Promise<void>
+    +validateInviteRequest(data: InviteData): boolean
+    +createInvitationRecord(data: InviteData): Promise<string>
+    +sendInviteEmail(email: string, inviteData: InviteData): Promise<void>
+}
+
+class UploadController {
+    -s3Service: S3Service
+    -validationService: ValidationService
+    +generateUploadUrl(req: Request, res: Response): Promise<void>
+    +validateUploadRequest(data: UploadData): boolean
+    +processFileUpload(file: File): Promise<UploadResult>
+    +handleUploadCallback(req: Request, res: Response): Promise<void>
+}
+
+class NotificationController {
+    -notificationService: NotificationService
+    -userService: UserService
+    +sendNotification(req: Request, res: Response): Promise<void>
+    +batchNotifications(req: Request, res: Response): Promise<void>
+    +markNotificationsRead(req: Request, res: Response): Promise<void>
+    +getUserNotifications(req: Request, res: Response): Promise<void>
+}
+
+class HealthController {
+    -databaseService: DatabaseService
+    -externalServices: ExternalService[]
+    +checkHealth(req: Request, res: Response): void
+    +checkDatabaseHealth(): Promise<HealthStatus>
+    +checkExternalServices(): Promise<ServiceHealth[]>
+    +generateHealthReport(): Promise<HealthReport>
+}
+
+class DatabaseController {
+    -mongoDB: MongoDBConnection
+    -firestore: FirestoreConnection
+    +checkDatabaseStatus(req: Request, res: Response): Promise<void>
+    +runIntegrityCheck(req: Request, res: Response): Promise<void>
+    +getDatabaseMetrics(req: Request, res: Response): Promise<void>
+    +backupDatabase(req: Request, res: Response): Promise<void>
+}
+
+' Services
+class EmailService {
+    -resendAPI: ResendAPI
+    -emailTemplates: EmailTemplate[]
+    +sendInvitationEmail(email: string, inviteData: InviteData): Promise<void>
+    +sendNotificationEmail(email: string, notification: Notification): Promise<void>
+    +sendPasswordReset(email: string, resetLink: string): Promise<void>
+    +renderTemplate(template: string, data: any): string
+    +validateEmail(email: string): boolean
+}
+
+class S3Service {
+    -s3Client: S3Client
+    -bucketName: string
+    +generatePresignedUrl(fileName: string, fileType: string): Promise<string>
+    +uploadFile(key: string, body: Buffer, metadata: FileMetadata): Promise<UploadResult>
+    +deleteFile(key: string): Promise<void>
+    +getFileMetadata(key: string): Promise<FileMetadata>
+    +listFiles(prefix: string): Promise<S3File[]>
+}
+
+class AIService {
+    -googleAI: GoogleAIAPI
+    -apiKey: string
+    +generateTaskSuggestions(projectData: ProjectData): Promise<Task[]>
+    +analyzeProjectProgress(projectData: ProjectData): Promise<AIInsights>
+    +predictCompletionDate(projectData: ProjectData): Promise<Date>
+    +optimizeResourceAllocation(resources: Resource[]): Promise<AllocationPlan>
+    +generateSmartSearchQuery(query: string): Promise<SearchQuery>
+}
+
+class DatabaseService {
+    -mongoConnection: MongoDBConnection
+    -firestoreConnection: FirestoreConnection
+    +executeQuery(query: DatabaseQuery): Promise<any>
+    +executeTransaction(operations: DatabaseOperation[]): Promise<TransactionResult>
+    +backupData(collections: string[]): Promise<BackupResult>
+    +restoreData(backup: Backup): Promise<RestoreResult>
+    +validateDataIntegrity(): Promise<IntegrityReport>
+}
+
+class ValidationService {
+    -schemas: ValidationSchema[]
+    +validateInviteData(data: InviteData): ValidationResult
+    +validateUploadData(data: UploadData): ValidationResult
+    +validateNotificationData(data: NotificationData): ValidationResult
+    +sanitizeInput(input: string): string
+    +checkFileSize(size: number, maxSize: number): boolean
+}
+
+' Database Layer
+class MongoDBConnection {
+    -client: MongoClient
+    -database: Db
+    -connectionString: string
+    +connect(): Promise<void>
+    +disconnect(): Promise<void>
+    +isConnected(): boolean
+    +getCollection(name: string): Collection
+    +executeCommand(command: Document): Promise<any>
+    +ping(): Promise<boolean>
+}
+
+class FirestoreConnection {
+    -admin: FirebaseAdmin
+    -db: Firestore
+    +connect(): Promise<void>
+    +disconnect(): Promise<void>
+    +getCollection(path: string): CollectionReference
+    +getDocument(path: string): Promise<DocumentSnapshot>
+    +setDocument(path: string, data: any): Promise<void>
+    +updateDocument(path: string, data: any): Promise<void>
+    +deleteDocument(path: string): Promise<void>
+}
+
+class DatabaseManager {
+    -mongoDB: MongoDBConnection
+    -firestore: FirestoreConnection
+    +initializeConnections(): Promise<void>
+    +switchDatabase(type: DatabaseType): void
+    +healthCheck(): Promise<DatabaseHealth>
+    +getActiveConnection(): DatabaseConnection
+    +closeAllConnections(): Promise<void>
+}
+
+' External APIs
+class ResendAPI {
+    -apiKey: string
+    -baseUrl: string
+    +sendEmail(emailData: EmailData): Promise<EmailResponse>
+    +validateApiKey(): Promise<boolean>
+    +getEmailStatus(emailId: string): Promise<EmailStatus>
+    +batchSend(emails: EmailData[]): Promise<BatchResponse>
+}
+
+class AWSAPI {
+    -accessKeyId: string
+    -secretAccessKey: string
+    -region: string
+    +initializeS3(): S3Client
+    +generatePresignedUrl(bucket: string, key: string, expiresIn: number): Promise<string>
+    +uploadToS3(bucket: string, key: string, body: Buffer): Promise<UploadResult>
+    +deleteFromS3(bucket: string, key: string): Promise<void>
+}
+
+class GoogleAIAPI {
+    -apiKey: string
+    -model: string
+    +generateText(prompt: string): Promise<string>
+    +analyzeContent(content: string): Promise<AnalysisResult>
+    +generateEmbeddings(text: string[]): Promise<number[][]>
+    +classifyText(text: string): Promise<ClassificationResult>
+}
+
+class FirebaseAdminAPI {
+    -credentials: ServiceAccount
+    -app: FirebaseApp
+    +initializeApp(): FirebaseApp
+    +verifyIdToken(token: string): Promise<DecodedIdToken>
+    +getUser(uid: string): Promise<UserRecord>
+    +createUser(userProperties: CreateUserRequest): Promise<UserRecord>
+    +updateUser(uid: string, properties: UpdateUserRequest): Promise<UserRecord>
+}
+
+' Middleware
+class RequestLogger {
+    -logger: Logger
+    +logRequest(req: Request, res: Response, next: NextFunction): void
+    +logResponse(req: Request, res: Response): void
+    +formatLogEntry(req: Request): LogEntry
+    +sanitizeLogData(data: any): any
+}
+
+class RateLimiter {
+    -limiter: RateLimit
+    +rateLimit(req: Request, res: Response, next: NextFunction): void
+    +checkRateLimit(identifier: string): Promise<boolean>
+    +getRateLimitInfo(identifier: string): RateLimitInfo
+    +resetRateLimit(identifier: string): void
+}
+
+class SecurityHeaders {
+    +addSecurityHeaders(req: Request, res: Response, next: NextFunction): void
+    +setCSP(res: Response): void
+    +setHSTS(res: Response): void
+    +setXFrameOptions(res: Response): void
+    +setContentTypeOptions(res: Response): void
+}
+
+class BodyParser {
+    +parseJSON(req: Request, res: Response, next: NextFunction): void
+    +parseURLencoded(req: Request, res: Response, next: NextFunction): void
+    +validateBody(req: Request, res: Response, next: NextFunction): void
+    +sanitizeBody(body: any): any
+}
+
+' Interfaces
+interface IEmailService {
+    +sendEmail(email: string, subject: string, body: string): Promise<void>
+    +sendTemplateEmail(email: string, template: string, data: any): Promise<void>
+}
+
+interface IStorageService {
+    +uploadFile(file: File): Promise<string>
+    +deleteFile(fileUrl: string): Promise<void>
+    +getFileUrl(fileId: string): Promise<string>
+}
+
+interface IAIService {
+    +processRequest(request: AIRequest): Promise<AIResponse>
+    +validateRequest(request: AIRequest): boolean
+}
+
+' Relationships
+Server --> APIRouter
+Server --> AuthMiddleware
+Server --> ErrorHandler
+Server --> CORSHandler
+
+APIRouter --> InviteController
+APIRouter --> UploadController
+APIRouter --> NotificationController
+APIRouter --> HealthController
+APIRouter --> DatabaseController
+
+InviteController --> EmailService
+UploadController --> S3Service
+NotificationController --> NotificationService
+HealthController --> DatabaseService
+DatabaseController --> MongoDBConnection
+DatabaseController --> FirestoreConnection
+
+EmailService --> ResendAPI
+S3Service --> AWSAPI
+AIService --> GoogleAIAPI
+AuthMiddleware --> FirebaseAdminAPI
+
+DatabaseService --> MongoDBConnection
+DatabaseService --> FirestoreConnection
+
+Server --> RequestLogger
+Server --> RateLimiter
+Server --> SecurityHeaders
+Server --> BodyParser
+
+' Service Dependencies
+EmailService ..|> IEmailService
+S3Service ..|> IStorageService
+AIService ..|> IAIService
+
+' Database Management
+DatabaseManager --> MongoDBConnection
+DatabaseManager --> FirestoreConnection
+
+' Error Handling Flow
+ErrorHandler --> Logger
+AuthMiddleware --> ErrorHandler
+InviteController --> ErrorHandler
+UploadController --> ErrorHandler
+
+' Configuration Flow
+Server --> DatabaseManager
+DatabaseManager --> MongoDBConnection
+DatabaseManager --> FirestoreConnection
+
+@enduml

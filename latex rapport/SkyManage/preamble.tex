@@ -1,0 +1,48 @@
+% --- Layout & Spacing ---
+% Margins: Left 3cm for binding, others 2.5cm
+\usepackage[left=3cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+
+% Line spacing 1.5
+\usepackage{setspace}
+\onehalfspacing
+
+% Font: Times New Roman 12pt
+\usepackage{mathptmx}
+
+% --- Titles Formatting ---
+% Chapter size 14, Bold
+\usepackage{titlesec}
+\titleformat{\chapter}{\normalfont\fontsize{14}{17}\bfseries}{\thechapter}{1em}{}
+% Titles must be Bold, NO underline, NO italics
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+
+% --- Navigation ---
+\usepackage{shorttoc} % For the Sommaire
+\usepackage[hidelinks]{hyperref} % For PDF links
+% Add this to your preamble.tex
+\usepackage{pdfpages}
+% --- Bibliography (ESIT Format) ---
+% Requirement: [Nom], [(Année)], [Titre]
+\usepackage[backend=bibtex, style=authoryear, sorting=nyt]{biblatex}
+\addbibresource{biblio.bib} 
+
+% Formats bibliography names: Lastname Firstname
+\DeclareNameAlias{author}{family-given}
+\renewcommand*{\nameyeardelim}{\addcomma\space}
+
+% --- Technical Support (SkyManage Specific) ---
+\usepackage{graphicx} % To include cloud/UML diagrams [cite: 144, 145]
+\usepackage{listings} % For code snippets (Node.js/React) [cite: 13]
+\usepackage{xcolor}
+
+% Code highlighting configuration
+\definecolor{codeblue}{rgb}{0,0,0.8}
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    keywordstyle=\color{codeblue}\bfseries,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny
+}

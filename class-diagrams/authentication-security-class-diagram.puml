@@ -1,0 +1,542 @@
+@startuml SkyManage Authentication and Security Class Diagram
+
+title SkyManage - Authentication and Security Class Diagram
+skinparam class {
+    BackgroundColor #LightSalmon
+    BorderColor #DarkRed
+    ArrowColor #DarkRed
+}
+skinparam interface {
+    BackgroundColor #LightGreen
+    BorderColor #DarkGreen
+    ArrowColor #DarkGreen
+}
+skinparam package {
+    BackgroundColor #LightGray
+    BorderColor #Black
+}
+
+' Package Declarations
+package "Authentication System" {
+    class AuthProvider
+    class FirebaseAuthService
+    class TokenManager
+    class SessionManager
+    class PasswordManager
+}
+
+package "Security Middleware" {
+    class AuthMiddleware
+    class PermissionMiddleware
+    class RateLimitMiddleware
+    class SecurityHeadersMiddleware
+    class CSRFProtection
+}
+
+package "User Management" {
+    class UserService
+    class UserProfileService
+    class RoleService
+    class PermissionService
+    class AuditService
+}
+
+package "Security Services" {
+    class EncryptionService
+    class HashingService
+    class ValidationService
+    class SecurityLogger
+    class ThreatDetection
+}
+
+package "Firebase Integration" {
+    class FirebaseAdmin
+    class FirebaseAuth
+    class FirestoreSecurity
+    class FirebaseTokenVerifier
+}
+
+package "External Security" {
+    class OAuthProvider
+    class JWTService
+    class TwoFactorService
+    class EmailVerificationService
+}
+
+package "Security Models" {
+    class UserSession
+    class SecurityContext
+    class Permission
+    class Role
+    class SecurityEvent
+    class AuditLog
+}
+
+' Authentication System Classes
+class AuthProvider {
+    -user: User | null
+    -loading: boolean
+    -authService: FirebaseAuthService
+    -sessionManager: SessionManager
+    +signIn(provider: AuthProvider): Promise<void>
+    +signOut(): Promise<void>
+    +signUp(email: string, password: string): Promise<void>
+    +resetPassword(email: string): Promise<void>
+    +updateProfile(profile: Partial<User>): Promise<void>
+    +getCurrentUser(): User | null
+    +onAuthStateChanged(callback: Function): Unsubscribe
+}
+
+class FirebaseAuthService {
+    -firebaseAuth: FirebaseAuth
+    -tokenManager: TokenManager
+    +signInWithPopup(provider: OAuthProvider): Promise<UserCredential>
+    +signInWithEmailAndPassword(email: string, password: string): Promise<UserCredential>
+    +createUserWithEmailAndPassword(email: string, password: string): Promise<UserCredential>
+    +signOut(): Promise<void>
+    +sendPasswordResetEmail(email: string): Promise<void>
+    +verifyIdToken(token: string): Promise<DecodedIdToken>
+    +refreshToken(refreshToken: string): Promise<TokenResult>
+}
+
+class TokenManager {
+    -accessToken: string | null
+    -refreshToken: string | null
+    -tokenExpiry: number
+    +setTokens(accessToken: string, refreshToken: string): void
+    +getAccessToken(): string | null
+    +getRefreshToken(): string | null
+    +isTokenExpired(): boolean
+    +refreshTokens(): Promise<void>
+    +clearTokens(): void
+    +validateToken(token: string): boolean
+}
+
+class SessionManager {
+    -sessions: Map<string, UserSession>
+    -sessionTimeout: number
+    +createSession(user: User): UserSession
+    +getSession(sessionId: string): UserSession | null
+    +updateSession(sessionId: string, updates: Partial<UserSession>): void
+    +destroySession(sessionId: string): void
+    +isSessionValid(sessionId: string): boolean
+    +cleanupExpiredSessions(): void
+    +getActiveSessions(): UserSession[]
+}
+
+class PasswordManager {
+    -hashingService: HashingService
+    -validationService: ValidationService
+    +hashPassword(password: string): Promise<string>
+    +verifyPassword(password: string, hash: string): Promise<boolean>
+    +validatePasswordStrength(password: string): PasswordStrength
+    +generateSecurePassword(length: number): string
+    +checkPasswordBreached(password: string): Promise<boolean>
+}
+
+' Security Middleware Classes
+class AuthMiddleware {
+    -tokenVerifier: FirebaseTokenVerifier
+    -sessionManager: SessionManager
+    +verifyToken(req: Request, res: Response, next: NextFunction): Promise<void>
+    +extractTokenFromRequest(req: Request): string | null
+    +attachUserToRequest(req: Request, user: User): void
+    +handleAuthError(error: AuthError, res: Response): void
+    +refreshTokenIfNeeded(req: Request, res: Response): Promise<void>
+}
+
+class PermissionMiddleware {
+    -permissionService: PermissionService
+    -roleService: RoleService
+    +checkPermission(permission: string): MiddlewareFunction
+    +checkRole(role: string): MiddlewareFunction
+    +checkOwnership(resourceId: string): MiddlewareFunction
+    +checkTeamMembership(teamId: string): MiddlewareFunction
+    +buildSecurityContext(user: User): SecurityContext
+}
+
+class RateLimitMiddleware {
+    -rateLimiter: Map<string, RateLimitInfo>
+    -windowMs: number
+    -maxRequests: number
+    +rateLimit(options: RateLimitOptions): MiddlewareFunction
+    +isRateLimited(identifier: string): boolean
+    +getRateLimitInfo(identifier: string): RateLimitInfo
+    +resetRateLimit(identifier: string): void
+    +cleanupExpiredEntries(): void
+}
+
+class SecurityHeadersMiddleware {
+    +addSecurityHeaders(req: Request, res: Response, next: NextFunction): void
+    +setContentSecurityPolicy(res: Response): void
+    +setHSTS(res: Response): void
+    +setXFrameOptions(res: Response): void
+    +setXContentTypeOptions(res: Response): void
+    +setReferrerPolicy(res: Response): void
+}
+
+class CSRFProtection {
+    -tokenGenerator: TokenGenerator
+    -tokenStore: TokenStore
+    +generateCSRFToken(): string
+    +validateCSRFToken(token: string): boolean
+    +attachCSRFToken(req: Request, res: Response): void
+    +rotateToken(oldToken: string): string
+}
+
+' User Management Classes
+class UserService {
+    -firestore: FirestoreSecurity
+    -authService: FirebaseAuthService
+    +createUser(userData: CreateUserRequest): Promise<User>
+    +getUserById(userId: string): Promise<User | null>
+    +getUserByEmail(email: string): Promise<User | null>
+    +updateUser(userId: string, updates: Partial<User>): Promise<User>
+    +deleteUser(userId: string): Promise<void>
+    +deactivateUser(userId: string): Promise<void>
+    +reactivateUser(userId: string): Promise<void>
+}
+
+class UserProfileService {
+    -userService: UserService
+    -validationService: ValidationService
+    +updateProfile(userId: string, profile: UserProfile): Promise<User>
+    +uploadAvatar(userId: string, avatar: File): Promise<string>
+    +updatePreferences(userId: string, preferences: UserPreferences): Promise<void>
+    +getProfilePrivacy(userId: string): Promise<PrivacySettings>
+    +updatePrivacySettings(userId: string, settings: PrivacySettings): Promise<void>
+}
+
+class RoleService {
+    -firestore: FirestoreSecurity
+    +createRole(role: CreateRoleRequest): Promise<Role>
+    +getRole(roleId: string): Promise<Role | null>
+    +updateRole(roleId: string, updates: Partial<Role>): Promise<Role>
+    +deleteRole(roleId: string): Promise<void>
+    +assignRoleToUser(userId: string, roleId: string): Promise<void>
+    +removeRoleFromUser(userId: string, roleId: string): Promise<void>
+    +getUserRoles(userId: string): Promise<Role[]>
+}
+
+class PermissionService {
+    -firestore: FirestoreSecurity
+    +createPermission(permission: CreatePermissionRequest): Promise<Permission>
+    +getPermission(permissionId: string): Promise<Permission | null>
+    +updatePermission(permissionId: string, updates: Partial<Permission>): Promise<Permission>
+    +deletePermission(permissionId: string): Promise<void>
+    +assignPermissionToRole(roleId: string, permissionId: string): Promise<void>
+    +removePermissionFromRole(roleId: string, permissionId: string): Promise<void>
+    +checkUserPermission(userId: string, permission: string): Promise<boolean>
+}
+
+class AuditService {
+    -firestore: FirestoreSecurity
+    -securityLogger: SecurityLogger
+    +logSecurityEvent(event: SecurityEvent): Promise<void>
+    +logUserAction(action: UserAction): Promise<void>
+    +logDataAccess(access: DataAccessEvent): Promise<void>
+    +getAuditLogs(filters: AuditFilters): Promise<AuditLog[]>
+    +generateAuditReport(filters: AuditFilters): Promise<AuditReport>
+    +archiveOldLogs(): Promise<void>
+}
+
+' Security Services Classes
+class EncryptionService {
+    -algorithm: string
+    -key: string
+    +encrypt(data: string): Promise<string>
+    +decrypt(encryptedData: string): Promise<string>
+    +encryptFile(buffer: Buffer): Promise<Buffer>
+    +decryptFile(encryptedBuffer: Buffer): Promise<Buffer>
+    +generateKey(): Promise<string>
+    +rotateKey(): Promise<void>
+}
+
+class HashingService {
+    -algorithm: string
+    -saltRounds: number
+    +hash(data: string): Promise<string>
+    +verifyHash(data: string, hash: string): Promise<boolean>
+    +generateSalt(): string
+    +hashFile(buffer: Buffer): Promise<string>
+    +verifyFileHash(buffer: Buffer, hash: string): Promise<boolean>
+}
+
+class ValidationService {
+    +validateEmail(email: string): ValidationResult
+    +validatePassword(password: string): ValidationResult
+    +validatePhoneNumber(phone: string): ValidationResult
+    +validateInput(input: string, rules: ValidationRules): ValidationResult
+    +sanitizeInput(input: string): string
+    +checkForMaliciousContent(input: string): boolean
+}
+
+class SecurityLogger {
+    -logger: Logger
+    +logSecurityEvent(level: LogLevel, event: SecurityEvent): void
+    +logAuthenticationAttempt(attempt: AuthAttempt): void
+    +logSecurityViolation(violation: SecurityViolation): void
+    +logThreatDetection(threat: Threat): void
+    +generateSecurityReport(period: ReportPeriod): SecurityReport
+}
+
+class ThreatDetection {
+    -patterns: ThreatPattern[]
+    -anomalyDetector: AnomalyDetector
+    +analyzeRequest(req: Request): ThreatAnalysis
+    +detectSuspiciousActivity(activity: UserActivity): Threat[]
+    +analyzeLoginPattern(attempts: LoginAttempt[]): Threat[]
+    +detectBruteForceAttack(attempts: AuthAttempt[]): boolean
+    +detectSQLInjection(input: string): boolean
+    +detectXSS(input: string): boolean
+}
+
+' Firebase Integration Classes
+class FirebaseAdmin {
+    -app: FirebaseApp
+    -auth: FirebaseAuth
+    -firestore: FirebaseFirestore
+    +initializeApp(): FirebaseApp
+    +getAuth(): FirebaseAuth
+    +getFirestore(): FirebaseFirestore
+    +verifyIdToken(token: string): Promise<DecodedIdToken>
+    +createCustomToken(uid: string, claims: any): Promise<string>
+}
+
+class FirebaseAuth {
+    -admin: FirebaseAdmin
+    +createUser(userProperties: CreateUserRequest): Promise<UserRecord>
+    +getUser(uid: string): Promise<UserRecord>
+    +getUserByEmail(email: string): Promise<UserRecord>
+    +updateUser(uid: string, properties: UpdateUserRequest): Promise<UserRecord>
+    +deleteUser(uid: string): Promise<void>
+    +listUsers(pageSize: number): Promise<ListUsersResult>
+}
+
+class FirestoreSecurity {
+    -firestore: FirebaseFirestore
+    -securityRules: SecurityRules
+    +createSecureCollection(path: string, rules: CollectionRules): CollectionReference
+    +validateDocumentAccess(path: string, userId: string, permission: string): Promise<boolean>
+    +applySecurityRules(document: DocumentSnapshot, context: SecurityContext): boolean
+    +logDataAccess(access: DataAccessEvent): Promise<void>
+}
+
+class FirebaseTokenVerifier {
+    -admin: FirebaseAdmin
+    -tokenCache: Map<string, DecodedIdToken>
+    +verifyIdToken(token: string): Promise<DecodedIdToken>
+    +verifyCustomToken(token: string): Promise<DecodedIdToken>
+    +refreshTokenVerification(token: string): Promise<DecodedIdToken>
+    +isTokenRevoked(token: string): Promise<boolean>
+    +getCachedToken(token: string): DecodedIdToken | null
+}
+
+' External Security Classes
+class OAuthProvider {
+    -providerId: string
+    -clientId: string
+    -clientSecret: string
+    +getAuthUrl(redirectUri: string): string
+    +exchangeCodeForToken(code: string, redirectUri: string): Promise<OAuthToken>
+    +refreshToken(refreshToken: string): Promise<OAuthToken>
+    +getUserInfo(token: string): Promise<OAuthUserInfo>
+    +revokeToken(token: string): Promise<void>
+}
+
+class JWTService {
+    -secretKey: string
+    -algorithm: string
+    +signToken(payload: JWTPayload): Promise<string>
+    +verifyToken(token: string): Promise<JWTPayload>
+    +decodeToken(token: string): JWTPayload
+    +isTokenExpired(token: string): boolean
+    +refreshToken(token: string): Promise<string>
+    +revokeToken(token: string): Promise<void>
+}
+
+class TwoFactorService {
+    -totpService: TOTPService
+    -smsService: SMSService
+    +enable2FA(userId: string): Promise<TwoFactorSetup>
+    +verify2FAToken(userId: string, token: string): Promise<boolean>
+    +generateBackupCodes(userId: string): Promise<string[]>
+    +verifyBackupCode(userId: string, code: string): Promise<boolean>
+    +disable2FA(userId: string, verificationToken: string): Promise<void>
+}
+
+class EmailVerificationService {
+    -emailService: EmailService
+    -tokenService: TokenService
+    +sendVerificationEmail(email: string): Promise<void>
+    +verifyEmail(token: string): Promise<boolean>
+    +resendVerificationEmail(email: string): Promise<void>
+    +isEmailVerified(userId: string): Promise<boolean>
+    +markEmailAsVerified(userId: string): Promise<void>
+}
+
+' Security Models
+class UserSession {
+    +sessionId: string
+    +userId: string
+    +createdAt: string
+    +lastActivity: string
+    +expiresAt: string
+    +ipAddress: string
+    +userAgent: string
+    +isActive: boolean
+    +isValid(): boolean
+    +extendSession(duration: number): void
+    +invalidate(): void
+}
+
+class SecurityContext {
+    +user: User
+    +roles: Role[]
+    +permissions: Permission[]
+    +session: UserSession
+    +ipAddress: string
+    +userAgent: string
+    +hasPermission(permission: string): boolean
+    +hasRole(role: string): boolean
+    +isOwner(resourceId: string): boolean
+    +isTeamMember(teamId: string): boolean
+}
+
+class Permission {
+    +id: string
+    +name: string
+    +description: string
+    +resource: string
+    +action: string
+    +conditions: PermissionCondition[]
+    +createdAt: string
+    +updatedAt: string
+    +evaluate(context: SecurityContext): boolean
+    +matches(resource: string, action: string): boolean
+}
+
+class Role {
+    +id: string
+    +name: string
+    +description: string
+    +permissions: Permission[]
+    +isSystem: boolean
+    +createdAt: string
+    +updatedAt: string
+    +hasPermission(permission: string): boolean
+    +addPermission(permission: Permission): void
+    +removePermission(permission: Permission): void
+}
+
+class SecurityEvent {
+    +id: string
+    +type: SecurityEventType
+    +severity: SecuritySeverity
+    +userId?: string
+    +ipAddress: string
+    +userAgent: string
+    +description: string
+    +metadata: EventMetadata
+    +createdAt: string
+    +isCritical(): boolean
+    +requiresAction(): boolean
+}
+
+class AuditLog {
+    +id: string
+    +userId: string
+    +action: string
+    +resource: string
+    +resourceId: string
+    +oldValue?: any
+    +newValue?: any
+    +ipAddress: string
+    +userAgent: string
+    +timestamp: string
+    +sessionId: string
+    +getChangeSummary(): string
+    +isDataModification(): boolean
+}
+
+' Interfaces
+interface IAuthService {
+    +signIn(credentials: Credentials): Promise<AuthResult>
+    +signOut(): Promise<void>
+    +signUp(userData: UserData): Promise<AuthResult>
+    +resetPassword(email: string): Promise<void>
+    +verifyToken(token: string): Promise<User>
+}
+
+interface ISecurityService {
+    +authenticate(req: Request): Promise<SecurityContext>
+    +authorize(context: SecurityContext, permission: string): boolean
+    +audit(event: SecurityEvent): Promise<void>
+}
+
+interface IEncryptionService {
+    +encrypt(data: string): Promise<string>
+    +decrypt(encryptedData: string): Promise<string>
+    +generateKey(): Promise<string>
+}
+
+' Relationships
+AuthProvider --> FirebaseAuthService
+AuthProvider --> SessionManager
+FirebaseAuthService --> TokenManager
+AuthMiddleware --> FirebaseTokenVerifier
+AuthMiddleware --> SessionManager
+
+PermissionMiddleware --> PermissionService
+PermissionMiddleware --> RoleService
+UserService --> FirebaseAuthService
+UserService --> FirestoreSecurity
+RoleService --> PermissionService
+AuditService --> SecurityLogger
+
+EncryptionService ..|> IEncryptionService
+FirebaseAuthService ..|> IAuthService
+AuthMiddleware ..|> ISecurityService
+
+SecurityLogger --> AuditLog
+ThreatDetection --> SecurityEvent
+UserService --> User
+RoleService --> Role
+PermissionService --> Permission
+
+' Security Flow
+AuthProvider --> UserSession
+AuthMiddleware --> SecurityContext
+PermissionMiddleware --> SecurityContext
+UserService --> SecurityEvent
+AuditService --> AuditLog
+
+' Authentication Flow
+FirebaseAuthService --> FirebaseAdmin
+FirebaseTokenVerifier --> FirebaseAdmin
+FirebaseAuth --> FirebaseAdmin
+FirestoreSecurity --> FirebaseAdmin
+
+' External Dependencies
+TwoFactorService --> TOTPService
+TwoFactorService --> SMSService
+EmailVerificationService --> EmailService
+OAuthProvider --> JWTService
+
+' Data Relationships
+UserSession --> User
+SecurityContext --> User
+SecurityContext --> Role
+SecurityContext --> Permission
+SecurityEvent --> User
+AuditLog --> User
+
+' Composition Relationships
+AuthProvider "1" -- "1" SessionManager
+AuthProvider "1" -- "1" TokenManager
+AuthMiddleware "1" -- "1" FirebaseTokenVerifier
+UserService "1" -- "1" AuditService
+RoleService "1" -- "*" Permission
+User "1" -- "*" Role
+
+@enduml

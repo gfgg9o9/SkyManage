@@ -1,0 +1,226 @@
+@startuml SkyManage Project Management Use Cases
+
+title SkyManage - Project Management Features Use Cases
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #LightCyan
+    BorderColor #DarkBlue
+    ArrowColor #DarkBlue
+}
+skinparam rectangle {
+    BackgroundColor #LightGray
+    BorderColor #Black
+}
+
+' Actors
+actor "Project Manager" as PM
+actor "Team Member" as TM
+actor "Stakeholder" as Stake
+actor "System" as System
+
+' System Boundary
+rectangle "Project Management Module" {
+    ' Project Lifecycle
+    usecase "Create Project" as UC1
+    usecase "Define Project Goals" as UC2
+    usecase "Set Project Timeline" as UC3
+    usecase "Allocate Budget" as UC4
+    usecase "Archive Project" as UC5
+    
+    ' Project Viewing and Navigation
+    usecase "View Project Dashboard" as UC6
+    usecase "View Project List" as UC7
+    usecase "Search Projects" as UC8
+    usecase "Filter Projects" as UC9
+    usecase "View Project Details" as UC10
+    
+    ' Project Configuration
+    usecase "Edit Project Settings" as UC11
+    usecase "Manage Project Members" as UC12
+    usecase "Set Project Permissions" as UC13
+    usecase "Configure Project Templates" as UC14
+    
+    ' Task Management within Projects
+    usecase "Create Task" as UC15
+    usecase "Organize Tasks in Kanban" as UC16
+    usecase "Set Task Dependencies" as UC17
+    usecase "Track Task Progress" as UC18
+    usecase "Manage Task Priorities" as UC19
+    
+    ' Milestone and Sprint Management
+    usecase "Create Milestones" as UC20
+    usecase "Plan Sprints" as UC21
+    usecase "Track Milestone Progress" as UC22
+    usecase "Generate Sprint Reports" as UC23
+    
+    ' Resource Management
+    usecase "Assign Resources" as UC24
+    usecase "Track Resource Utilization" as UC25
+    usecase "Manage Workload Distribution" as UC26
+    usecase "Resource Forecasting" as UC27
+    
+    ' Project Documentation
+    usecase "Upload Project Files" as UC28
+    usecase "Manage Project Wiki" as UC29
+    usecase "Version Control Documents" as UC30
+    usecase "Export Project Data" as UC31
+}
+
+' Project Manager interactions
+PM --> UC1
+PM --> UC2
+PM --> UC3
+PM --> UC4
+PM --> UC5
+PM --> UC6
+PM --> UC7
+PM --> UC8
+PM --> UC9
+PM --> UC10
+PM --> UC11
+PM --> UC12
+PM --> UC13
+PM --> UC14
+PM --> UC15
+PM --> UC16
+PM --> UC17
+PM --> UC18
+PM --> UC19
+PM --> UC20
+PM --> UC21
+PM --> UC22
+PM --> UC23
+PM --> UC24
+PM --> UC25
+PM --> UC26
+PM --> UC27
+PM --> UC28
+PM --> UC29
+PM --> UC30
+PM --> UC31
+
+' Team Member interactions
+TM --> UC6
+TM --> UC7
+TM --> UC8
+TM --> UC9
+TM --> UC10
+TM --> UC15
+TM --> UC16
+PM --> UC18
+TM --> UC19
+TM --> UC28
+TM --> UC29
+TM --> UC30
+
+' Stakeholder interactions
+Stake --> UC6
+Stake --> UC7
+Stake --> UC10
+Stake --> UC22
+Stake --> UC23
+Stake --> UC31
+
+' System interactions
+System --> UC16
+System --> UC18
+System --> UC25
+System --> UC26
+
+' Relationships and Dependencies
+UC1 ..> UC2 : <<include>>
+UC1 ..> UC3 : <<include>>
+UC1 ..> UC12 : <<include>>
+UC1 ..> UC13 : <<include>>
+UC21 ..> UC15 : <<include>>
+UC17 ..> UC18 : <<extend>>
+UC20 ..> UC22 : <<include>>
+UC24 ..> UC25 : <<extend>>
+UC28 ..> UC30 : <<extend>>
+
+' Use Case Groupings
+package "Project Creation" {
+    UC1
+    UC2
+    UC3
+    UC4
+}
+
+package "Project Monitoring" {
+    UC6
+    UC7
+    UC8
+    UC9
+    UC10
+    UC18
+    UC22
+    UC25
+}
+
+package "Task Management" {
+    UC15
+    UC16
+    UC17
+    UC18
+    UC19
+}
+
+package "Resource Planning" {
+    UC24
+    UC25
+    UC26
+    UC27
+}
+
+' Detailed Flow Notes
+note right of UC1
+  Project Creation:
+  - Enter project name and description
+  - Select project template
+  - Set start and end dates
+  - Define initial team members
+  - Configure project settings
+end note
+
+note right of UC16
+  Kanban Board:
+  - Drag and drop tasks
+  - Customizable columns
+  - Swim lanes for teams
+  - Work in progress limits
+  - Automated task movement
+end note
+
+note left of UC17
+  Task Dependencies:
+  - Finish-to-Start
+  - Start-to-Start
+  - Finish-to-Finish
+  - Critical path calculation
+  - Dependency visualization
+end note
+
+note bottom of UC21
+  Sprint Planning:
+  - Define sprint goals
+  - Select backlog items
+  - Estimate story points
+  - Assign team capacity
+  - Set sprint duration
+end note
+
+' Exception Handling
+note top of UC5
+  Project Archiving:
+  - Move to read-only state
+  - Preserve all data
+  - Remove from active lists
+  - Maintain access for reports
+  - Can be reactivated if needed
+end note
+
+' Actor Generalizations
+PM <|-- TM
+TM <|-- Stake
+
+@enduml

@@ -1,0 +1,47 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% Configuration and packages
+\input{preamble}
+
+\begin{document}
+
+% --- FRONT MATTER (Roman numerals) ---
+\pagenumbering{roman}
+
+% Page de garde (Annexe 1)
+\includepdf{sections/page de garde.pdf}
+% Mandatory Blank Page
+\newpage\null\thispagestyle{empty}\newpage 
+
+\include{sections/attestation}
+\include{sections/disclaimer} % ESIT specific quote
+\include{sections/dedicaces}
+\include{sections/remerciements}
+
+% Sommaire (Chapters and Sections only)
+\shorttableofcontents{Sommaire}{1}
+
+\listoffigures
+\listoftables
+\include{sections/abbreviations}
+
+% --- MAIN CONTENT (Arabic numerals) ---
+\pagenumbering{arabic} % Pagination starts from Intro
+
+\include{chapters/introduction_generale} % 2-page minimum
+
+\include{chapters/chap1_existant}    % Organization & Current limits
+\include{chapters/chap2_etat_art}    % MERN & Cloud Comparison
+\include{chapters/chap3_solution}    % Conception & SkyManage Architecture
+\include{chapters/chap4_tests}       % Functional tests & Value added
+
+\include{chapters/conclusion_generale} % 2-page minimum
+
+% --- BACK MATTER ---
+\printbibliography[title={Bibliographie}] % Alphabetical
+\include{sections/annexes}
+
+% Detailed Table of Contents
+\tableofcontents 
+
+\end{document}

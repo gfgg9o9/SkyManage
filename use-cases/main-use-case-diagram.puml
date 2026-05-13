@@ -1,0 +1,167 @@
+@startuml SkyManage Main Use Case Diagram
+
+' Title and styling
+title SkyManage Platform - Main Use Case Diagram
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #LightBlue
+    BorderColor #DarkBlue
+    ArrowColor #DarkBlue
+}
+skinparam rectangle {
+    BackgroundColor #LightGray
+    BorderColor #Black
+}
+
+' Actors
+actor "User" as User
+actor "Project Manager" as PM
+actor "Team Member" as TM
+actor "Administrator" as Admin
+actor "AI System" as AI
+
+' System Boundary
+rectangle "SkyManage Platform" {
+    ' Authentication Use Cases
+    usecase "Login" as UC1
+    usecase "Register" as UC2
+    usecase "Logout" as UC3
+    usecase "Reset Password" as UC4
+    usecase "Manage Profile" as UC5
+    
+    ' Project Management Use Cases
+    usecase "Create Project" as UC6
+    usecase "View Projects" as UC7
+    usecase "Edit Project" as UC8
+    usecase "Delete Project" as UC9
+    usecase "Search Projects" as UC10
+    
+    ' Task Management Use Cases
+    usecase "Create Task" as UC11
+    usecase "View Tasks" as UC12
+    usecase "Edit Task" as UC13
+    usecase "Delete Task" as UC14
+    usecase "Assign Task" as UC15
+    usecase "Update Task Status" as UC16
+    
+    ' Collaboration Use Cases
+    usecase "Invite Team Member" as UC17
+    usecase "Manage Invitations" as UC18
+    usecase "Real-time Chat" as UC19
+    usecase "File Sharing" as UC20
+    usecase "Comments & Mentions" as UC21
+    
+    ' AI & Analytics Use Cases
+    usecase "AI Task Suggestions" as UC22
+    usecase "Smart Search" as UC23
+    usecase "Project Analytics" as UC24
+    usecase "Predictive Insights" as UC25
+    usecase "Automated Reports" as UC26
+    
+    ' System Management Use Cases
+    usecase "System Settings" as UC27
+    usecase "User Management" as UC28
+    usecase "Audit Logs" as UC29
+    usecase "System Health Check" as UC30
+}
+
+' Relationships - User interactions
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC7
+User --> UC10
+User --> UC12
+User --> UC19
+User --> UC20
+User --> UC21
+User --> UC23
+
+' Project Manager interactions
+PM --> UC1
+PM --> UC5
+PM --> UC6
+PM --> UC7
+PM --> UC8
+PM --> UC9
+PM --> UC10
+PM --> UC11
+PM --> UC12
+PM --> UC13
+PM --> UC14
+PM --> UC15
+PM --> UC16
+PM --> UC17
+PM --> UC18
+PM --> UC19
+PM --> UC20
+PM --> UC21
+PM --> UC22
+PM --> UC23
+PM --> UC24
+PM --> UC25
+PM --> UC26
+
+' Team Member interactions
+TM --> UC1
+TM --> UC5
+TM --> UC7
+TM --> UC10
+TM --> UC12
+TM --> UC13
+TM --> UC16
+TM --> UC18
+TM --> UC19
+TM --> UC20
+TM --> UC21
+TM --> UC23
+
+' Administrator interactions
+Admin --> UC1
+Admin --> UC5
+Admin --> UC27
+Admin --> UC28
+Admin --> UC29
+Admin --> UC30
+
+' AI System interactions
+AI --> UC22
+AI --> UC23
+AI --> UC24
+AI --> UC25
+AI --> UC26
+
+' Generalizations
+User <|-- PM
+User <|-- TM
+User <|-- Admin
+
+' Use Case Extensions and Inclusions
+UC17 ..> UC18 : <<include>>
+UC22 ..> UC11 : <<extend>>
+UC23 ..> UC7 : <<extend>>
+UC24 ..> UC7 : <<include>>
+UC25 ..> UC24 : <<extend>>
+
+' Notes
+note right of UC22
+  AI provides intelligent
+  task recommendations
+  based on project context
+end note
+
+note right of UC23
+  Natural language search
+  across projects, tasks,
+  and files
+end note
+
+note left of UC17
+  Email invitations with
+  role-based access
+  control
+end note
+
+@enduml

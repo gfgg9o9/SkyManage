@@ -114,8 +114,8 @@ export default function Dashboard({ searchQuery = '', onViewAuditLog }: Dashboar
             <span className="text-[10px] bg-sky-500/20 text-sky-400 px-2 py-1 rounded font-bold uppercase tracking-widest">{t('dashboard.realtime')}</span>
           </div>
           <div className="h-80 flex flex-col md:flex-row items-center justify-center gap-12">
-            <div className="flex-1 w-full h-full">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="flex-1 w-full h-full min-h-[320px]">
+              <ResponsiveContainer width="100%" height={320} minWidth={0} minHeight={undefined}>
                 <PieChart>
                   <Pie
                     data={pieData}
@@ -190,8 +190,8 @@ export default function Dashboard({ searchQuery = '', onViewAuditLog }: Dashboar
             <h3 className="font-bold text-lg">{t('dashboard.priority_dist')}</h3>
             <span className="text-[10px] bg-indigo-500/20 text-indigo-400 px-2 py-1 rounded font-bold uppercase tracking-widest">{t('dashboard.analytics')}</span>
           </div>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-80 w-full min-h-[320px]">
+            <ResponsiveContainer width="100%" height={320} minWidth={0} minHeight={undefined}>
               <BarChart data={barData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} />

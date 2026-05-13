@@ -1,0 +1,273 @@
+@startuml SkyManage Collaboration Use Cases
+
+title SkyManage - Collaboration Features Use Cases
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #LightPink
+    BorderColor #DarkRed
+    ArrowColor #DarkRed
+}
+skinparam rectangle {
+    BackgroundColor #LightYellow
+    BorderColor #Black
+}
+
+' Actors
+actor "Team Member" as TM
+actor "Project Manager" as PM
+actor "External Collaborator" as External
+actor "Email Service" as Email
+actor "File Storage" as Storage
+
+' System Boundary
+rectangle "Collaboration Module" {
+    ' Invitation System
+    usecase "Send Project Invitation" as UC1
+    usecase "Accept Invitation" as UC2
+    usecase "Decline Invitation" as UC3
+    usecase "Resend Invitation" as UC4
+    usecase "Revoke Invitation" as UC5
+    usecase "Manage Pending Invitations" as UC6
+    
+    ' Real-time Communication
+    usecase "Start Chat Session" as UC7
+    usecase "Send Message" as UC8
+    usecase "Share Files in Chat" as UC9
+    usecase "Create Group Chat" as UC10
+    usecase "Video Conference" as UC11
+    usecase "Screen Sharing" as UC12
+    
+    ' Comments and Mentions
+    usecase "Add Comment to Task" as UC13
+    usecase "Reply to Comments" as UC14
+    usecase "Mention Team Members" as UC15
+    usecase "Edit Comments" as UC16
+    usecase "Delete Comments" as UC17
+    usecase "Resolve Comments" as UC18
+    
+    ' File Sharing and Collaboration
+    usecase "Upload Files" as UC19
+    usecase "Share Files" as UC20
+    usecase "Set File Permissions" as UC21
+    usecase "Version Control" as UC22
+    usecase "Preview Files" as UC23
+    usecase "Download Files" as UC24
+    
+    ' Activity Tracking
+    usecase "View Activity Feed" as UC25
+    usecase "Track User Activity" as UC26
+    usecase "Generate Activity Reports" as UC27
+    usecase "Set Activity Notifications" as UC28
+    
+    ' Notification System
+    usecase "Send Notification" as UC29
+    usecase "Manage Notification Preferences" as UC30
+    usecase "Mark Notifications Read" as UC31
+    usecase "Email Notifications" as UC32
+    usecase "Push Notifications" as UC33
+    
+    ' Access Control
+    usecase "Assign Roles" as UC34
+    usecase "Manage Permissions" as UC35
+    usecase "Create Access Groups" as UC36
+    usecase "Audit Access Changes" as UC37
+}
+
+' Team Member interactions
+TM --> UC1
+TM --> UC2
+TM --> UC3
+TM --> UC6
+TM --> UC7
+TM --> UC8
+TM --> UC9
+TM --> UC10
+TM --> UC13
+TM --> UC14
+TM --> UC15
+TM --> UC16
+TM --> UC17
+TM --> UC18
+TM --> UC19
+TM --> UC20
+TM --> UC23
+TM --> UC24
+TM --> UC25
+TM --> UC28
+TM --> UC29
+TM --> UC30
+TM --> UC31
+
+' Project Manager interactions
+PM --> UC1
+PM --> UC4
+PM --> UC5
+PM --> UC6
+PM --> UC7
+PM --> UC8
+PM --> UC9
+PM --> UC10
+PM --> UC11
+PM --> UC12
+PM --> UC13
+PM --> UC14
+PM --> UC15
+PM --> UC16
+PM --> UC17
+PM --> UC18
+PM --> UC19
+TM --> UC20
+PM --> UC21
+PM --> UC22
+TM --> UC23
+TM --> UC24
+PM --> UC25
+PM --> UC26
+PM --> UC27
+PM --> UC28
+PM --> UC29
+PM --> UC30
+PM --> UC31
+PM --> UC32
+PM --> UC33
+PM --> UC34
+PM --> UC35
+PM --> UC36
+PM --> UC37
+
+' External Collaborator interactions
+External --> UC2
+External --> UC3
+External --> UC7
+External --> UC8
+External --> UC9
+External --> UC13
+External --> UC14
+External --> UC15
+External --> UC19
+External --> UC23
+External --> UC24
+External --> UC25
+
+' External System interactions
+Email --> UC1
+Email --> UC4
+Email --> UC32
+Storage --> UC19
+Storage --> UC20
+Storage --> UC22
+Storage --> UC23
+Storage --> UC24
+
+' Relationships and Dependencies
+UC1 ..> UC32 : <<include>>
+UC2 ..> UC6 : <<extend>>
+UC7 ..> UC8 : <<include>>
+UC10 ..> UC7 : <<extend>>
+UC13 ..> UC15 : <<extend>>
+UC19 ..> UC21 : <<include>>
+UC20 ..> UC21 : <<extend>>
+UC22 ..> UC19 : <<extend>>
+UC25 ..> UC26 : <<include>>
+UC29 ..> UC32 : <<extend>>
+UC29 ..> UC33 : <<extend>>
+UC34 ..> UC35 : <<include>>
+
+' Use Case Groupings
+package "Invitation Management" {
+    UC1
+    UC2
+    UC3
+    UC4
+    UC5
+    UC6
+}
+
+package "Real-time Communication" {
+    UC7
+    UC8
+    UC9
+    UC10
+    UC11
+    UC12
+}
+
+package "File Collaboration" {
+    UC19
+    UC20
+    UC21
+    UC22
+    UC23
+    UC24
+}
+
+package "Notification System" {
+    UC29
+    UC30
+    UC31
+    UC32
+    UC33
+}
+
+' Detailed Flow Notes
+note right of UC1
+  Invitation Process:
+  - Select user role and permissions
+  - Generate secure invitation link
+  - Send email with invitation
+  - Track invitation status
+  - Set expiration date
+end note
+
+note right of UC15
+  Mention System:
+  - @username mentions
+  - Role-based mentions (@team, @managers)
+  - Project-wide mentions
+  - Email notifications for mentions
+  - Mention history tracking
+end note
+
+note left of UC22
+  Version Control:
+  - Automatic version tracking
+  - Compare file versions
+  - Restore previous versions
+  - Version comments and tags
+  - Branching support
+end note
+
+note bottom of UC25
+  Activity Feed:
+  - Real-time updates
+  - Filter by user/project
+  - Activity categories
+  - Timestamp tracking
+  - Export activity logs
+end note
+
+' Exception Handling
+note top of UC5
+  Invitation Revocation:
+  - Immediate access removal
+  - Notification to invitee
+  - Reason for revocation
+  - Audit trail creation
+  - Cannot be undone
+end note
+
+' Actor Generalizations
+TM <|-- PM
+External <|-- TM
+
+' Security and Compliance Notes
+note right of UC37
+  Access Audit:
+  - Log all permission changes
+  - Track role assignments
+  - Monitor access patterns
+  - Generate compliance reports
+  - Alert on suspicious activity
+end note
+
+@enduml

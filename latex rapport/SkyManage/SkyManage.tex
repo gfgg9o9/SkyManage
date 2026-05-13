@@ -1,0 +1,250 @@
+\documentclass[12pt,a4paper]{report}
+
+% Packages essentiels
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+\usepackage{times}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{float}
+
+% Configuration des marges selon le guide PFE
+\geometry{
+    left=3cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+% Interligne 1.5 selon le guide PFE
+\onehalfspacing
+
+% Configuration des liens
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={SkyManage - Plateforme de Gestion de Projets Académiques},
+    pdfauthor={Étudiant EPI/UIT},
+    pdfsubject={Projet de Fin d'Études}
+}
+
+% Configuration des titres
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries\centering}
+{\chaptertitlename\ \thechapter}{20pt}{\Huge\bfseries}
+
+\titleformat{\section}
+{\normalfont\Large\bfseries}
+{\thesection}{1em}{}
+
+\titleformat{\subsection}
+{\normalfont\large\bfseries}
+{\thesubsection}{1em}{}
+
+% Configuration de la table des matières
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftsecfont}{\normalfont}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+% Configuration des en-têtes et pieds de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{\thepage}
+
+% Informations du document
+\title{SkyManage : Plateforme Intelligente de Gestion de Projets Académiques}
+\author{Étudiant Mastère Professionnel\\École Polytechnique Internationale (EPI/UIT)}
+\date{Année Universitaire 2025/2026}
+
+% Début du document
+\begin{document}
+
+% Page de garde
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\LARGE\bfseries République Tunisienne}\\[0.5cm]
+    {\large Ministère de l'Enseignement Supérieur et de la Recherche Scientifique}\\[1cm]
+    
+    {\Large\bfseries École Supérieure Internationale Privée de Tunis}\\[0.5cm]
+    {\Large Université Internationale de Tunis}\\[2cm]
+    
+    {\Huge\bfseries Projet de Fin d'Études}\\[1cm]
+    {\LARGE\bfseries SkyManage}\\[0.5cm]
+    {\large Plateforme Intelligente de Gestion de Projets Académiques}\\[2cm]
+    
+    {\large Mastère Professionnel en Ingénierie Informatique}\\[0.5cm]
+    {\large Année Universitaire 2025/2026}\\[2cm]
+    
+    {\large\bfseries Présenté par :}\\[0.5cm]
+    {\large Nom de l'étudiant}\\[1cm]
+    
+    {\large\bfseries Sous la direction de :}\\[0.5cm]
+    {\large Nom de l'encadrant universitaire}\\[1cm]
+    
+    {\large\bfseries Soutenu le :}\\[0.5cm]
+    {\large Date de soutenance}
+    
+    \vfill
+    
+    {\large\bfseries Jury :}\\[0.5cm]
+    {\large Président : Membre du jury}\\[0.3cm]
+    {\large Rapporteur : Membre du jury}\\[0.3cm]
+    {\large Membre : Membre du jury}
+\end{titlepage}
+
+% Page blanche
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+% Page d'attestation (à adapter selon le modèle officiel)
+\newpage
+\chapter*{Attestation de stage}
+
+[Texte de l'attestation de stage officielle de l'EPI/UIT]
+
+% Dédicaces (optionnel)
+\newpage
+\thispagestyle{empty}
+\chapter*{Dédicaces}
+
+Je dédie ce travail à mes parents pour leur soutien inconditionnel, à mes frères et sœurs pour leur encouragement, et à tous ceux qui ont cru en moi.
+
+% Remerciements
+\newpage
+\chapter*{Remerciements}
+
+Je tiens à exprimer ma profonde gratitude à toutes les personnes qui ont contribué à la réalisation de ce projet de fin d'études.
+
+Mes remerciements s'adressent particulièrement à :
+\begin{itemize}
+    \item Mon encadrant universitaire, [Nom], pour sa disponibilité, ses conseils avisés et son soutien tout au long de ce projet.
+    \item Mon encadrant professionnel, [Nom], pour son expertise et ses précieuses recommandations.
+    \item Les membres du jury, [Noms], pour leur temps et leurs évaluations constructives.
+    \item L'ensemble du corps professoral de l'EPI/UIT pour la qualité de l'enseignement reçu.
+    \item Mes camarades de promotion pour leur soutien et leur entraide.
+    \item Ma famille pour sa patience et son encouragement durant cette période intense.
+\end{itemize}
+
+% Sommaire
+\newpage
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+% Liste des tableaux
+\listoftables
+\addcontentsline{toc}{chapter}{Liste des tableaux}
+\newpage
+
+% Liste des figures
+\listoffigures
+\addcontentsline{toc}{chapter}{Liste des figures}
+\newpage
+
+% Liste des abréviations
+\chapter*{Liste des abréviations}
+\begin{acronym}
+    \item[EPI] École Polytechnique Internationale
+    \item[UIT] Université Internationale de Tunis
+    \item[PFE] Projet de Fin d'Études
+    \item[IA] Intelligence Artificielle
+    \item[API] Application Programming Interface
+    \item[UI] User Interface
+    \item[UX] User Experience
+    \item[RBAC] Role-Based Access Control
+    \item[JWT] JSON Web Token
+    \item[CRUD] Create, Read, Update, Delete
+    \item[RGPD] Règlement Général sur la Protection des Données
+    \item[SaaS] Software as a Service
+    \item[SQL] Structured Query Language
+    \item[NoSQL] Not Only SQL
+\end{acronym}
+\newpage
+
+% Introduction générale
+\input{IntroductionGenerale}
+
+% Chapitre 1
+\chapter{Présentation de l'organisme d'accueil et étude de l'existant}
+\input{Chapitre1_OrganismeExistant}
+
+% Chapitre 2
+\chapter{État d'art sur les technologies de gestion de projet}
+\input{Chapitre2_EtatArt}
+
+% Chapitre 3
+\chapter{Présentation de votre solution : conception, spécification des besoins, développement, configuration, mise en place}
+\input{Chapitre3_PresentationSolution}
+
+% Chapitre 4
+\chapter{Test et évaluation de la solution}
+\input{Chapitre4_TestEvaluation}
+
+% Conclusion générale
+\chapter*{Conclusion générale}
+\input{ConclusionGenerale}
+
+% Bibliographie
+\newpage
+\addcontentsline{toc}{chapter}{Bibliographie}
+\chapter*{Bibliographie}
+\input{Bibliographie}
+
+% Annexes (si nécessaire)
+\appendix
+\chapter{Code source des composants principaux}
+\label{annexe:code}
+
+\section{Composant ProjectCard}
+\label{annexe:projectcard}
+[Code source du composant ProjectCard]
+
+\section{Service ProjectService}
+\label{annexe:projectservice}
+[Code source du service ProjectService]
+
+\chapter{Configuration de déploiement}
+\label{annexe:deployment}
+
+\section{Variables d'environnement}
+\label{annexe:env}
+[Configuration des variables d'environnement]
+
+\section{Docker Compose}
+\label{annexe:docker}
+[Fichier docker-compose.yml]
+
+\chapter{Résultats complets des tests}
+\label{annexe:tests}
+
+\section{Tests de performance}
+\label{annexe:performance}
+[Résultats détaillés des tests de performance]
+
+\section{Tests de sécurité}
+\label{annexe:security}
+[Résultats détaillés des tests de sécurité]
+
+% Table des matières détaillée
+\newpage
+\chapter*{Table des matières détaillée}
+\tableofcontents
+
+\end{document}

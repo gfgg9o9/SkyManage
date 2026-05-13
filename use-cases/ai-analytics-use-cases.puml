@@ -1,0 +1,318 @@
+@startuml SkyManage AI & Analytics Use Cases
+
+title SkyManage - AI Features & Analytics Use Cases
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #Lavender
+    BorderColor #Purple
+    ArrowColor #Purple
+}
+skinparam rectangle {
+    BackgroundColor #LightGray
+    BorderColor #Black
+}
+
+' Actors
+actor "Project Manager" as PM
+actor "Team Member" as TM
+actor "Data Analyst" as Analyst
+actor "AI System" as AI
+actor "External AI Service" as Gemini
+
+' System Boundary
+rectangle "AI & Analytics Module" {
+    ' AI-Powered Features
+    usecase "AI Task Recommendations" as UC1
+    usecase "Smart Task Prioritization" as UC2
+    usecase "Predictive Project Analytics" as UC3
+    usecase "Risk Assessment" as UC4
+    usecase "Resource Optimization" as UC5
+    usecase "Automated Status Updates" as UC6
+    
+    ' Natural Language Processing
+    usecase "Natural Language Search" as UC7
+    usecase "Text Summarization" as UC8
+    usecase "Sentiment Analysis" as UC9
+    usecase "Auto-tagging Content" as UC10
+    usecase "Language Translation" as UC11
+    
+    ' Smart Search & Discovery
+    usecase "Semantic Search" as UC12
+    usecase "Content Recommendations" as UC13
+    usecase "Similar Project Detection" as UC14
+    usecase "Expert Identification" as UC15
+    usecase "Knowledge Base Queries" as UC16
+    
+    ' Analytics & Reporting
+    usecase "Generate Project Reports" as UC17
+    usecase "Performance Analytics" as UC18
+    usecase "Team Productivity Metrics" as UC19
+    usecase "Time Tracking Analysis" as UC20
+    usecase "Budget Forecasting" as UC21
+    usecase "Custom Dashboards" as UC22
+    
+    ' Predictive Analytics
+    usecase "Project Completion Prediction" as UC23
+    usecase "Burn Rate Analysis" as UC24
+    usecase "Sprint Velocity Prediction" as UC25
+    usecase "Quality Trend Analysis" as UC26
+    usecase "Team Performance Forecasting" as UC27
+    
+    ' AI Assistant Features
+    usecase "AI Chat Assistant" as UC28
+    usecase "Automated Meeting Notes" as UC29
+    usecase "Smart Notifications" as UC30
+    usecase "Workflow Automation" as UC31
+    usecase "Intelligent Reminders" as UC32
+    
+    ' Data Visualization
+    usecase "Interactive Charts" as UC33
+    usecase "Heat Maps" as UC34
+    usecase "Network Graphs" as UC35
+    usecase "Timeline Visualizations" as UC36
+    usecase "Real-time Metrics" as UC37
+}
+
+' Project Manager interactions
+PM --> UC1
+PM --> UC2
+PM --> UC3
+PM --> UC4
+PM --> UC5
+PM --> UC6
+PM --> UC7
+PM --> UC8
+PM --> UC12
+PM --> UC13
+PM --> UC14
+PM --> UC17
+PM --> UC18
+PM --> UC19
+PM --> UC20
+PM --> UC21
+PM --> UC22
+PM --> UC23
+PM --> UC24
+PM --> UC25
+PM --> UC26
+PM --> UC27
+PM --> UC28
+PM --> UC29
+PM --> UC30
+PM --> UC31
+PM --> UC32
+PM --> UC33
+PM --> UC34
+PM --> UC35
+PM --> UC36
+PM --> UC37
+
+' Team Member interactions
+TM --> UC1
+TM --> UC2
+TM --> UC6
+TM --> UC7
+TM --> UC8
+TM --> UC9
+TM --> UC10
+TM --> UC11
+TM --> UC12
+TM --> UC13
+TM --> UC15
+TM --> UC16
+TM --> UC18
+TM --> UC19
+TM --> UC20
+TM --> UC28
+TM --> UC29
+TM --> UC30
+TM --> UC32
+TM --> UC33
+TM --> UC36
+TM --> UC37
+
+' Data Analyst interactions
+Analyst --> UC3
+Analyst --> UC4
+Analyst --> UC5
+Analyst --> UC7
+Analyst --> UC17
+Analyst --> UC18
+Analyst --> UC19
+Analyst --> UC20
+Analyst --> UC21
+Analyst --> UC22
+Analyst --> UC23
+Analyst --> UC24
+Analyst --> UC25
+Analyst --> UC26
+Analyst --> UC27
+Analyst --> UC33
+Analyst --> UC34
+Analyst --> UC35
+Analyst --> UC36
+
+' AI System interactions
+AI --> UC1
+AI --> UC2
+AI --> UC3
+AI --> UC4
+AI --> UC5
+AI --> UC6
+AI --> UC7
+AI --> UC8
+AI --> UC9
+AI --> UC10
+AI --> UC11
+AI --> UC12
+AI --> UC13
+AI --> UC14
+AI --> UC15
+AI --> UC16
+AI --> UC23
+AI --> UC24
+AI --> UC25
+AI --> UC26
+AI --> UC27
+AI --> UC28
+AI --> UC29
+AI --> UC30
+AI --> UC31
+AI --> UC32
+
+' External AI Service interactions
+Gemini --> UC1
+Gemini --> UC2
+Gemini --> UC3
+Gemini --> UC7
+Gemini --> UC8
+Gemini --> UC9
+Gemini --> UC10
+Gemini --> UC11
+Gemini --> UC28
+Gemini --> UC29
+
+' Relationships and Dependencies
+UC1 ..> UC2 : <<extend>>
+UC3 ..> UC23 : <<include>>
+UC4 ..> UC3 : <<extend>>
+UC7 ..> UC12 : <<include>>
+UC12 ..> UC13 : <<extend>>
+UC17 ..> UC18 : <<include>>
+UC18 ..> UC19 : <<extend>>
+UC23 ..> UC24 : <<extend>>
+UC28 ..> UC7 : <<include>>
+UC31 ..> UC6 : <<extend>>
+UC33 ..> UC34 : <<extend>>
+
+' Use Case Groupings
+package "AI-Powered Assistance" {
+    UC1
+    UC2
+    UC6
+    UC28
+    UC29
+    UC30
+    UC31
+    UC32
+}
+
+package "Natural Language Processing" {
+    UC7
+    UC8
+    UC9
+    UC10
+    UC11
+}
+
+package "Predictive Analytics" {
+    UC3
+    UC4
+    UC5
+    UC23
+    UC24
+    UC25
+    UC26
+    UC27
+}
+
+package "Data Visualization" {
+    UC33
+    UC34
+    UC35
+    UC36
+    UC37
+}
+
+' Detailed Flow Notes
+note right of UC1
+  AI Task Recommendations:
+  - Analyze project context
+  - Suggest task priorities
+  - Recommend team assignments
+  - Identify missing tasks
+  - Learning from historical data
+end note
+
+note right of UC7
+  Natural Language Search:
+  - Query: "tasks due this week"
+  - Query: "high priority bugs"
+  - Query: "John's assignments"
+  - Context-aware results
+  - Voice search support
+end note
+
+note left of UC23
+  Project Completion Prediction:
+  - Historical data analysis
+  - Current progress tracking
+  - Team velocity calculation
+  - Risk factor consideration
+  - Confidence scoring
+end note
+
+note bottom of UC28
+  AI Chat Assistant:
+  - Project status queries
+  - Task creation assistance
+  - Meeting scheduling help
+  - Document summarization
+  - Multi-language support
+end note
+
+' AI Model Integration Notes
+note top of UC3
+  Predictive Analytics Engine:
+  - Machine learning models
+  - Time series analysis
+  - Anomaly detection
+  - Pattern recognition
+  - Continuous learning
+end note
+
+' Data Privacy and Ethics
+note right of UC9
+  Sentiment Analysis:
+  - Team morale tracking
+  - Communication patterns
+  - Conflict detection
+  - Anonymous aggregation
+  - Ethical AI guidelines
+end note
+
+' Performance Considerations
+note bottom of UC37
+  Real-time Metrics:
+  - Live data streaming
+  - Low-latency processing
+  - Scalable architecture
+  - Caching strategies
+  - Performance monitoring
+end note
+
+' Actor Generalizations
+PM <|-- TM
+TM <|-- Analyst
+
+@enduml

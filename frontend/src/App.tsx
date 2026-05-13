@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import { Loader2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useProjects } from './hooks/useFirestore';
+import { Invitations } from './components/Invitations';
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -98,6 +99,16 @@ function AppContent() {
             className="h-full"
           >
             <Projects onSelectProject={setSelectedProjectId} searchQuery={searchQuery} />
+          </motion.div>
+        ) : activeTab === 'invitations' ? (
+          <motion.div
+            key="invitations"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="h-full"
+          >
+            <Invitations userId={user?.uid} userEmail={user?.email} />
           </motion.div>
         ) : activeTab === 'mission_control' ? (
           <motion.div

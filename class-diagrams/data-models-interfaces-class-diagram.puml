@@ -1,0 +1,544 @@
+@startuml SkyManage Data Models and Interfaces Class Diagram
+
+title SkyManage - Data Models and Interfaces Class Diagram
+skinparam class {
+    BackgroundColor #LightPink
+    BorderColor #DarkRed
+    ArrowColor #DarkRed
+}
+skinparam interface {
+    BackgroundColor #LightGreen
+    BorderColor #DarkGreen
+    ArrowColor #DarkGreen
+}
+skinparam enum {
+    BackgroundColor #LightYellow
+    BorderColor #DarkOrange
+    ArrowColor #DarkOrange
+}
+skinparam package {
+    BackgroundColor #LightGray
+    BorderColor #Black
+}
+
+' Package Declarations
+package "Core Data Models" {
+    class User
+    class Project
+    class Task
+    class Comment
+    class Notification
+    class TerminalEvent
+}
+
+package "Supporting Models" {
+    class ProjectMember
+    class FileAttachment
+    class Invitation
+    class ActivityLog
+    class SystemMetrics
+}
+
+package "Enums and Types" {
+    enum Priority
+    enum Status
+    enum Role
+    enum NotificationType
+    enum EventType
+}
+
+package "Interfaces" {
+    interface IDataModel
+    interface IAuditable
+    interface ITimestamped
+    interface ISearchable
+    interface INotifiable
+}
+
+package "Configuration Models" {
+    class UserSettings
+    class ProjectSettings
+    class SystemConfig
+    class APIConfig
+}
+
+package "AI and Analytics Models" {
+    class AIInsight
+    class TaskSuggestion
+    class ProjectAnalytics
+    class UserBehavior
+    class SearchQuery
+}
+
+' Core Data Models
+class User {
+    +uid: string
+    +displayName: string
+    +email: string
+    +photoURL?: string
+    +lastLogin?: string
+    +createdAt: string
+    +updatedAt: string
+    +settings: UserSettings
+    +isActive: boolean
+    +preferences: UserPreferences
+    +getEmail(): string
+    +getDisplayName(): string
+    +updateProfile(updates: Partial<User>): void
+    +toJSON(): UserJSON
+    +validate(): ValidationResult
+}
+
+class Project {
+    +id: string
+    +name: string
+    +description: string
+    +ownerId: string
+    +members: string[]
+    +admins?: string[]
+    +pms?: string[]
+    +memberDetails?: ProjectMember[]
+    +settings: ProjectSettings
+    +createdAt: string
+    +updatedAt: string
+    +status: ProjectStatus
+    +tags: string[]
+    +addMember(member: ProjectMember): void
+    +removeMember(userId: string): void
+    +updateSettings(settings: Partial<ProjectSettings>): void
+    +isMember(userId: string): boolean
+    +isAdmin(userId: string): boolean
+    +toJSON(): ProjectJSON
+}
+
+class Task {
+    +id: string
+    +projectId: string
+    +title: string
+    +description: string
+    +status: Status
+    +priority: Priority
+    +assigneeId?: string
+    +reporterId: string
+    +dueDate?: string
+    +progress: number
+    +estimatedHours?: number
+    +actualHours?: number
+    +tags: string[]
+    +attachments: FileAttachment[]
+    +dependencies: string[]
+    +createdAt: string
+    +updatedAt: string
+    +updateStatus(status: Status): void
+    +assignTo(userId: string): void
+    +addAttachment(attachment: FileAttachment): void
+    +addDependency(taskId: string): void
+    +calculateProgress(): number
+    +isOverdue(): boolean
+    +toJSON(): TaskJSON
+}
+
+class Comment {
+    +id: string
+    +taskId: string
+    +authorId: string
+    +authorName?: string
+    +authorPhoto?: string
+    +content: string
+    +mentions: string[]
+    +attachments: FileAttachment[]
+    +isEdited: boolean
+    +editedAt?: string
+    +createdAt: string
+    +updatedAt: string
+    +editContent(content: string): void
+    +addMention(userId: string): void
+    +removeMention(userId: string): void
+    +toJSON(): CommentJSON
+}
+
+class Notification {
+    +id: string
+    +userId: string
+    +type: NotificationType
+    +message: string
+    +projectId?: string
+    +taskId?: string
+    +read: boolean
+    +data?: NotificationData
+    +createdAt: string
+    +readAt?: string
+    +markAsRead(): void
+    +markAsUnread(): void
+    +getActionUrl(): string
+    +toJSON(): NotificationJSON
+}
+
+class TerminalEvent {
+    +id: string
+    +type: EventType
+    +userId: string
+    +userName: string
+    +projectId?: string
+    +projectName?: string
+    +taskId?: string
+    +taskTitle?: string
+    +details: string
+    +metadata?: EventMetadata
+    +createdAt: string
+    +getFormattedMessage(): string
+    +getSeverity(): EventSeverity
+    +toJSON(): TerminalEventJSON
+}
+
+' Supporting Models
+class ProjectMember {
+    +userId?: string
+    +role: Role
+    +email: string
+    +status: MemberStatus
+    +invitedAt?: string
+    +joinedAt?: string
+    +permissions: Permission[]
+    +isActive(): boolean
+    +isPending(): boolean
+    +hasPermission(permission: Permission): boolean
+    +toJSON(): ProjectMemberJSON
+}
+
+class FileAttachment {
+    +id: string
+    +fileName: string
+    +fileUrl: string
+    +fileSize: number
+    +fileType: string
+    +uploadedBy: string
+    +uploadedAt: string
+    +isPublic: boolean
+    +metadata: FileMetadata
+    +getDownloadUrl(): string
+    +getThumbnailUrl(): string
+    +toJSON(): FileAttachmentJSON
+}
+
+class Invitation {
+    +id: string
+    +projectId: string
+    +projectName: string
+    +inviterName: string
+    +inviterEmail: string
+    +recipientEmail: string
+    +role: Role
+    +status: InvitationStatus
+    +token: string
+    +expiresAt: string
+    +createdAt: string
+    +acceptedAt?: string
+    +isExpired(): boolean
+    +accept(): void
+    +decline(): void
+    +toJSON(): InvitationJSON
+}
+
+class ActivityLog {
+    +id: string
+    +userId: string
+    +action: string
+    +resourceType: string
+    +resourceId: string
+    +details: ActivityDetails
+    +ipAddress?: string
+    +userAgent?: string
+    +createdAt: string
+    +toJSON(): ActivityLogJSON
+}
+
+class SystemMetrics {
+    +id: string
+    +timestamp: string
+    +activeUsers: number
+    +totalProjects: number
+    +totalTasks: number
+    +systemLoad: number
+    +memoryUsage: number
+    +diskUsage: number
+    +responseTime: number
+    +errorRate: number
+    +toJSON(): SystemMetricsJSON
+}
+
+' Enums
+enum Priority {
+    LOW
+    MEDIUM
+    HIGH
+    URGENT
+}
+
+enum Status {
+    TODO
+    IN_PROGRESS
+    DONE
+    BLOCKED
+    CANCELLED
+}
+
+enum Role {
+    ADMIN
+    PM
+    MEMBER
+    VIEWER
+}
+
+enum NotificationType {
+    TASK_ASSIGNED
+    TASK_UPDATED
+    COMMENT_ADDED
+    PROJECT_INVITE
+    SYSTEM_NOTIFICATION
+    MENTION
+    DEADLINE_REMINDER
+}
+
+enum EventType {
+    TASK_MOVE
+    STATUS_CHANGE
+    USER_JOIN
+    PROJECT_CREATE
+    COMMENT_ADD
+    FILE_UPLOAD
+    LOGIN
+    LOGOUT
+}
+
+' Interfaces
+interface IDataModel {
+    +id: string
+    +toJSON(): JSON
+    +validate(): ValidationResult
+    +fromJSON(data: JSON): IDataModel
+}
+
+interface IAuditable {
+    +createdAt: string
+    +updatedAt: string
+    +createdBy?: string
+    +updatedBy?: string
+    +getAuditTrail(): AuditEntry[]
+}
+
+interface ITimestamped {
+    +createdAt: string
+    +updatedAt: string
+    +getTimeSinceCreation(): string
+    +isRecentlyUpdated(): boolean
+}
+
+interface ISearchable {
+    +getSearchTerms(): string[]
+    +matches(query: string): boolean
+    +getSearchScore(query: string): number
+}
+
+interface INotifiable {
+    +getNotificationRecipients(): string[]
+    +getNotificationMessage(action: string): string
+    +shouldNotify(action: string): boolean
+}
+
+' Configuration Models
+class UserSettings {
+    +theme: Theme
+    +language: string
+    +timezone: string
+    +emailNotifications: boolean
+    +pushNotifications: boolean
+    +dateFormat: string
+    +timeFormat: string
+    +defaultProjectView: ProjectView
+    +autoSave: boolean
+    +updateSetting(key: string, value: any): void
+    +resetToDefaults(): void
+    +toJSON(): UserSettingsJSON
+}
+
+class ProjectSettings {
+    +isPublic: boolean
+    +allowGuestAccess: boolean
+    +defaultTaskPriority: Priority
+    +autoAssignTasks: boolean
+    +enableTimeTracking: boolean
+    +enableComments: boolean
+    +enableFileAttachments: boolean
+    +workflow: WorkflowConfig
+    +updateSetting(key: string, value: any): void
+    +toJSON(): ProjectSettingsJSON
+}
+
+class SystemConfig {
+    +maintenanceMode: boolean
+    +maxFileSize: number
+    +allowedFileTypes: string[]
+    +sessionTimeout: number
+    +rateLimit: RateLimitConfig
+    +backupSchedule: BackupConfig
+    +securityConfig: SecurityConfig
+    +updateConfig(key: string, value: any): void
+    +validate(): ValidationResult
+    +toJSON(): SystemConfigJSON
+}
+
+class APIConfig {
+    +firebase: FirebaseConfig
+    +mongodb: MongoDBConfig
+    +aws: AWSConfig
+    +email: EmailConfig
+    +ai: AIConfig
+    +validate(): ValidationResult
+    +toJSON(): APIConfigJSON
+}
+
+' AI and Analytics Models
+class AIInsight {
+    +id: string
+    +projectId: string
+    +type: InsightType
+    +title: string
+    +description: string
+    +confidence: number
+    +recommendations: string[]
+    +data: InsightData
+    +createdAt: string
+    +isActionable(): boolean
+    +toJSON(): AIInsightJSON
+}
+
+class TaskSuggestion {
+    +id: string
+    +projectId: string
+    +title: string
+    +description: string
+    +priority: Priority
+    +estimatedHours: number
+    +assigneeId?: string
+    +dueDate?: string
+    +confidence: number
+    +reasoning: string
+    +createdAt: string
+    +accept(): void
+    +reject(): void
+    +toJSON(): TaskSuggestionJSON
+}
+
+class ProjectAnalytics {
+    +projectId: string
+    +period: AnalyticsPeriod
+    +taskCompletionRate: number
+    +averageTaskDuration: number
+    +teamProductivity: TeamProductivity[]
+    +resourceUtilization: ResourceUtilization[]
+    +riskFactors: RiskFactor[]
+    +trends: AnalyticsTrend[]
+    +generatedAt: string
+    +getInsights(): AIInsight[]
+    +toJSON(): ProjectAnalyticsJSON
+}
+
+class UserBehavior {
+    +userId: string
+    +loginFrequency: number
+    +taskCompletionRate: number
+    +collaborationScore: number
+    +preferredWorkingHours: number[]
+    +activityPatterns: ActivityPattern[]
+    +skillTags: string[]
+    +lastUpdated: string
+    +getProductivityScore(): number
+    +getCollaborationStyle(): CollaborationStyle
+    +toJSON(): UserBehaviorJSON
+}
+
+class SearchQuery {
+    +query: string
+    +filters: SearchFilter[]
+    +sort: SortOption
+    +limit: number
+    +offset: number
+    +context: SearchContext
+    +execute(): Promise<SearchResult[]>
+    +addFilter(filter: SearchFilter): void
+    +removeFilter(filterType: string): void
+    +toJSON(): SearchQueryJSON
+}
+
+' Interface Implementations
+User ..|> IDataModel
+User ..|> IAuditable
+User ..|> ITimestamped
+User ..|> ISearchable
+User ..|> INotifiable
+
+Project ..|> IDataModel
+Project ..|> IAuditable
+Project ..|> ITimestamped
+Project ..|> ISearchable
+Project ..|> INotifiable
+
+Task ..|> IDataModel
+Task ..|> IAuditable
+Task ..|> ITimestamped
+Task ..|> ISearchable
+Task ..|> INotifiable
+
+Comment ..|> IDataModel
+Comment ..|> ITimestamped
+Comment ..|> ISearchable
+
+Notification ..|> IDataModel
+Notification ..|> ITimestamped
+
+TerminalEvent ..|> IDataModel
+TerminalEvent ..|> ITimestamped
+
+' Model Relationships
+User "1" -- "*" Project : "owns"
+User "1" -- "*" Task : "assigned to"
+User "1" -- "*" Comment : "author"
+User "1" -- "*" Notification : "recipient"
+User "1" -- "*" TerminalEvent : "actor"
+
+Project "1" -- "*" Task : "contains"
+Project "1" -- "*" ProjectMember : "has"
+Project "1" -- "*" Invitation : "sends"
+Project "1" -- "*" AIInsight : "generates"
+Project "1" -- "*" ProjectAnalytics : "analyzes"
+
+Task "1" -- "*" Comment : "has"
+Task "1" -- "*" FileAttachment : "contains"
+Task "*" -- "*" Task : "depends on"
+
+User "1" -- "1" UserSettings : "has"
+User "1" -- "1" UserBehavior : "tracks"
+
+Project "1" -- "1" ProjectSettings : "has"
+
+' Type Associations
+Task -- Priority : "has"
+Task -- Status : "has"
+ProjectMember -- Role : "has"
+Notification -- NotificationType : "has"
+TerminalEvent -- EventType : "has"
+
+' Composition Relationships
+ProjectMember --> User : "references"
+Invitation --> Project : "references"
+FileAttachment --> User : "uploaded by"
+ActivityLog --> User : "performed by"
+SystemMetrics --> System : "monitors"
+
+' Aggregation Relationships
+ProjectAnalytics --> AIInsight : "aggregates"
+UserBehavior --> ActivityLog : "analyzes"
+SearchQuery --> SearchResult : "produces"
+
+@enduml

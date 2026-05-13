@@ -1,0 +1,363 @@
+@startuml SkyManage Main Architecture Class Diagram
+
+!theme plain
+title SkyManage - Main Architecture Class Diagram
+skinparam class {
+    BackgroundColor #LightBlue
+    BorderColor #DarkBlue
+    ArrowColor #DarkBlue
+    FontSize 10
+}
+skinparam interface {
+    BackgroundColor #LightGreen
+    BorderColor #DarkGreen
+    ArrowColor #DarkGreen
+    FontSize 10
+}
+skinparam package {
+    BackgroundColor #LightGray
+    BorderColor #Black
+    FontSize 12
+}
+
+' Layout settings for better readability
+page 3x2
+skinparam maxMessageSize 80
+skinparam maxElementSize 80
+
+' Package Declarations
+package "Frontend (React)" as Frontend {
+    class App
+    class AuthProvider
+    class Layout
+    class Dashboard
+    class Projects
+    class Settings
+    class MissionControl
+    class NeuralNetwork
+    class TerminalLog
+}
+
+package "Backend (Express)" as Backend {
+    class Server
+    class APIRouter
+    class AuthMiddleware
+    class ErrorHandler
+}
+
+package "Database Layer" as Database {
+    interface IFirestoreService
+    class FirestoreService
+    interface IMongoService
+    class MongoService
+}
+
+package "External Services" as External {
+    class FirebaseAuthentication
+    class FirebaseFirestore
+    class GoogleGenerativeAI
+    class AWSS3
+    class EmailService
+}
+
+package "Data Models" {
+    class User
+    class Project
+    class Task
+    class Comment
+    class Notification
+    class TerminalEvent
+}
+
+package "Hooks (React Custom Hooks)" as Hooks {
+    class useAuth
+    class useProjects
+    class useTasks
+    class useComments
+    class useNotifications
+    class useTerminalEvents
+}
+
+' Frontend Classes (Simplified)
+class App {
+    -state: AppState
+    +render(): JSX.Element
+    +handleTabChange(tab: string): void
+    +handleProjectSelect(projectId: string): void
+}
+
+class AuthProvider {
+    -user: User | null
+    -loading: boolean
+    +signIn(): Promise<void>
+    +logout(): Promise<void>
+}
+
+class Layout {
+    -activeTab: string
+    +renderNavigation(): JSX.Element
+    +handleTabNavigation(tab: string): void
+}
+
+class Dashboard {
+    -projects: Project[]
+    +renderProjectOverview(): JSX.Element
+    +renderTaskSummary(): JSX.Element
+}
+
+class Projects {
+    -projects: Project[]
+    +renderProjectList(): JSX.Element
+    +handleProjectCreate(project: Project): void
+}
+
+class Settings {
+    -userSettings: UserSettings
+    +renderUserPreferences(): JSX.Element
+}
+
+class MissionControl {
+    -systemMetrics: SystemMetrics
+    +renderSystemStatus(): JSX.Element
+}
+
+class NeuralNetwork {
+    -aiData: AIData
+    +renderAIVisualization(): JSX.Element
+}
+
+class TerminalLog {
+    -events: TerminalEvent[]
+    +renderTerminalOutput(): JSX.Element
+}
+
+' Backend Classes (Simplified)
+class Server {
+    -app: Express
+    -port: number
+    +start(): void
+    +setupMiddleware(): void
+    +setupRoutes(): void
+}
+
+class APIRouter {
+    +handleInvite(req: Request, res: Response): Promise<void>
+    +handleUpload(req: Request, res: Response): Promise<void>
+    +handleHealthCheck(req: Request, res: Response): void
+}
+
+class AuthMiddleware {
+    +verifyToken(req: Request, res: Response, next: NextFunction): void
+    +checkPermissions(permission: string): MiddlewareFunction
+}
+
+class ErrorHandler {
+    +handleError(error: Error, req: Request, res: Response): void
+    +logError(error: Error): void
+}
+
+' Database Layer (Simplified)
+interface IFirestoreService {
+    +connect(): Promise<void>
+    +createDocument(collection: string, data: any): Promise<string>
+    +getDocument(collection: string, id: string): Promise<any>
+}
+
+class FirestoreService {
+    -db: Firestore
+    +connect(): Promise<void>
+    +createDocument(collection: string, data: any): Promise<string>
+    +setupRealtimeListener(collection: string, callback: Function): Unsubscribe
+}
+
+interface IMongoService {
+    +connect(): Promise<void>
+    +insertOne(collection: string, document: any): Promise<InsertResult>
+    +findOne(collection: string, filter: any): Promise<any>
+}
+
+class MongoService {
+    -client: MongoClient
+    -database: Db
+    +connect(): Promise<void>
+    +insertOne(collection: string, document: any): Promise<InsertResult>
+}
+
+' External Services (Simplified)
+class FirebaseAuthentication {
+    +signInWithPopup(provider: AuthProvider): Promise<UserCredential>
+    +signOut(): Promise<void>
+    +onAuthStateChanged(callback: Function): Unsubscribe
+}
+
+class FirebaseFirestore {
+    +collection(collectionName: string): CollectionReference
+    +doc(documentPath: string): DocumentReference
+}
+
+class GoogleGenerativeAI {
+    -apiKey: string
+    +generateText(prompt: string): Promise<string>
+    +analyzeProjectData(data: ProjectData): Promise<AIInsights>
+}
+
+class AWSS3 {
+    -client: S3Client
+    +generateUploadUrl(fileName: string, fileType: string): Promise<string>
+    +uploadFile(key: string, body: Buffer): Promise<UploadResult>
+}
+
+class EmailService {
+    +sendInvitation(email: string, projectData: ProjectData): Promise<void>
+    +sendNotification(email: string, notification: Notification): Promise<void>
+}
+
+' Data Models (Simplified)
+class User {
+    +uid: string
+    +displayName: string
+    +email: string
+    +photoURL?: string
+    +lastLogin?: string
+}
+
+class Project {
+    +id: string
+    +name: string
+    +description: string
+    +ownerId: string
+    +members: string[]
+    +createdAt: string
+    +updatedAt: string
+}
+
+class Task {
+    +id: string
+    +projectId: string
+    +title: string
+    +status: Status
+    +priority: Priority
+    +assigneeId?: string
+    +progress: number
+    +createdAt: string
+}
+
+class Comment {
+    +id: string
+    +taskId: string
+    +authorId: string
+    +content: string
+    +createdAt: string
+}
+
+class Notification {
+    +id: string
+    +userId: string
+    +type: string
+    +message: string
+    +read: boolean
+    +createdAt: string
+}
+
+class TerminalEvent {
+    +id: string
+    +type: EventType
+    +userId: string
+    +details: string
+    +createdAt: string
+}
+
+' React Hooks (Simplified)
+class useAuth {
+    +user: User | null
+    +loading: boolean
+    +signIn(): Promise<void>
+    +logout(): Promise<void>
+}
+
+class useProjects {
+    +projects: Project[]
+    +loading: boolean
+    +createProject(name: string, description: string): Promise<void>
+    +deleteProject(projectId: string): Promise<void>
+    +addProjectMember(projectId: string, email: string): Promise<void>
+}
+
+class useTasks {
+    +tasks: Task[]
+    +loading: boolean
+    +createTask(task: Partial<Task>): Promise<void>
+    +updateTask(taskId: string, updates: Partial<Task>): Promise<void>
+}
+
+class useComments {
+    +comments: Comment[]
+    +loading: boolean
+    +addComment(content: string): Promise<void>
+}
+
+class useNotifications {
+    +notifications: Notification[]
+    +markAsRead(notificationId: string): Promise<void>
+}
+
+class useTerminalEvents {
+    +events: TerminalEvent[]
+    +loading: boolean
+}
+
+' Key High-Level Relationships
+Frontend --> Backend : HTTP/WebSocket
+Backend --> Database : Database Calls
+Backend --> External : API Calls
+
+' Frontend Component Relationships
+App --> AuthProvider
+App --> Layout
+Layout --> Dashboard
+Layout --> Projects
+Layout --> Settings
+Layout --> MissionControl
+Layout --> NeuralNetwork
+Layout --> TerminalLog
+
+' Hook Dependencies
+AuthProvider --> FirebaseAuthentication
+Dashboard --> useProjects
+Projects --> useProjects
+Settings --> useAuth
+
+' Hook to Service Relationships
+useAuth --> FirebaseAuthentication
+useProjects --> FirestoreService
+useTasks --> FirestoreService
+useComments --> FirestoreService
+useNotifications --> FirestoreService
+useTerminalEvents --> FirestoreService
+
+' Backend Service Relationships
+Server --> APIRouter
+Server --> AuthMiddleware
+Server --> ErrorHandler
+APIRouter --> EmailService
+APIRouter --> AWSS3
+APIRouter --> GoogleGenerativeAI
+
+' Database Interface Implementations
+FirestoreService ..|> IFirestoreService
+MongoService ..|> IMongoService
+
+' Service to External API Relationships
+FirestoreService --> FirebaseFirestore
+MongoService --> MongoClient
+
+' Data Model Relationships
+Project --> User : "owner"
+Task --> Project : "belongs to"
+Task --> User : "assignee"
+Comment --> Task : "belongs to"
+Comment --> User : "author"
+Notification --> User : "recipient"
+TerminalEvent --> User : "actor"
+
+@enduml

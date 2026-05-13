@@ -1,0 +1,396 @@
+@startuml SkyManage Frontend Components Class Diagram
+
+title SkyManage - Frontend React Components Class Diagram
+skinparam class {
+    BackgroundColor #LightCyan
+    BorderColor #DarkBlue
+    ArrowColor #DarkBlue
+}
+skinparam interface {
+    BackgroundColor #LightGreen
+    BorderColor #DarkGreen
+    ArrowColor #DarkGreen
+}
+skinparam package {
+    BackgroundColor #LightGray
+    BorderColor #Black
+}
+
+' Package Declarations
+package "Main Components" {
+    class App
+    class Layout
+    class Login
+}
+
+package "Page Components" {
+    class Dashboard
+    class Projects
+    class Settings
+    class MissionControl
+    class NeuralNetwork
+    class TerminalLog
+    class ProjectDetails
+}
+
+package "UI Components" {
+    class KanbanBoard
+    class TaskModal
+    class FileUploader
+    class SmartSearch
+    class Invitations
+    class Toast
+    class Profile
+}
+
+package "Custom Hooks" {
+    class useAuth
+    class useProjects
+    class useTasks
+    class useComments
+    class useNotifications
+    class useTerminalEvents
+    class useInvitations
+}
+
+package "Data Types" {
+    interface DashboardProps
+    interface ProjectsProps
+    interface SettingsProps
+    interface TaskModalProps
+    interface FileUploaderProps
+}
+
+' Main Components
+class App {
+    -state: AppState
+    -activeTab: string
+    -selectedProjectId: string | null
+    -searchQuery: string
+    +render(): JSX.Element
+    +handleTabChange(tab: string): void
+    +handleProjectSelect(projectId: string): void
+    +handleSearch(query: string): void
+}
+
+class Layout {
+    -activeTab: string
+    -searchQuery: string
+    -sidebarOpen: boolean
+    +renderNavigation(): JSX.Element
+    +renderHeader(): JSX.Element
+    +handleTabNavigation(tab: string): void
+    +handleSearch(query: string): void
+    +toggleSidebar(): void
+}
+
+class Login {
+    -loading: boolean
+    -error: string | null
+    +render(): JSX.Element
+    +handleGoogleSignIn(): Promise<void>
+    +handleEmailSignIn(email: string, password: string): Promise<void>
+}
+
+' Page Components
+class Dashboard {
+    -searchQuery: string
+    -onViewAuditLog: Function
+    -stats: StatItem[]
+    -chartData: ChartData[]
+    +render(): JSX.Element
+    +renderStatsCards(): JSX.Element
+    +renderCharts(): JSX.Element
+    +renderRecentActivity(): JSX.Element
+    +filterTasks(query: string): Task[]
+    +calculateStats(): StatItem[]
+}
+
+class Projects {
+    -onSelectProject: Function
+    -searchQuery: string
+    -projects: Project[]
+    -loading: boolean
+    -isCreating: boolean
+    -newProjectName: string
+    -newProjectDesc: string
+    +render(): JSX.Element
+    +handleCreateProject(): Promise<void>
+    +handleDeleteProject(projectId: string): Promise<void>
+    +handleProjectClick(projectId: string): void
+    +filterProjects(query: string): Project[]
+}
+
+class Settings {
+    -user: User
+    -settings: UserSettings
+    +render(): JSX.Element
+    +handleProfileUpdate(profile: UserProfile): Promise<void>
+    +handlePreferenceChange(preference: string, value: any): void
+    +handleLanguageChange(language: string): void
+    +handleThemeChange(theme: string): void
+}
+
+class MissionControl {
+    -systemMetrics: SystemMetrics
+    -performanceData: PerformanceData[]
+    +render(): JSX.Element
+    +renderSystemStatus(): JSX.Element
+    +renderPerformanceCharts(): JSX.Element
+    +fetchSystemMetrics(): Promise<void>
+    +refreshData(): void
+}
+
+class NeuralNetwork {
+    -aiData: AIData
+    -modelState: ModelState
+    +render(): JSX.Element
+    +renderNeuralNetwork(): JSX.Element
+    +processAIInput(input: string): Promise<AIResponse>
+    +trainModel(data: TrainingData): Promise<void>
+    +visualizeNetwork(): JSX.Element
+}
+
+class TerminalLog {
+    -events: TerminalEvent[]
+    -loading: boolean
+    -filter: EventFilter
+    +render(): JSX.Element
+    +renderTerminal(): JSX.Element
+    +filterEvents(filter: EventFilter): TerminalEvent[]
+    +exportLogs(): void
+    +clearLogs(): void
+}
+
+class ProjectDetails {
+    -projectId: string
+    -onBack: Function
+    -searchQuery: string
+    -project: Project | null
+    -tasks: Task[]
+    +render(): JSX.Element
+    +renderProjectHeader(): JSX.Element
+    +renderTaskList(): JSX.Element
+    +renderTeamMembers(): JSX.Element
+    +handleTaskCreate(task: TaskData): Promise<void>
+    +handleTaskUpdate(taskId: string, updates: Partial<Task>): Promise<void>
+}
+
+' UI Components
+class KanbanBoard {
+    -tasks: Task[]
+    -columns: Column[]
+    -draggedTask: Task | null
+    +render(): JSX.Element
+    +renderColumns(): JSX.Element
+    +handleDragStart(task: Task): void
+    +handleDrop(columnId: string, task: Task): void
+    +handleTaskClick(task: Task): void
+    +updateTaskStatus(taskId: string, status: Status): Promise<void>
+}
+
+class TaskModal {
+    -isOpen: boolean
+    -task: Task | null
+    -mode: 'create' | 'edit'
+    +render(): JSX.Element
+    +handleSubmit(taskData: TaskData): Promise<void>
+    +handleCancel(): void
+    +validateTask(taskData: TaskData): boolean
+    +resetForm(): void
+}
+
+class FileUploader {
+    -files: File[]
+    -uploading: boolean
+    -progress: number
+    +render(): JSX.Element
+    +handleFileSelect(files: File[]): void
+    +handleUpload(): Promise<void>
+    +handleProgress(progress: number): void
+    +generateUploadUrl(fileName: string): Promise<string>
+}
+
+class SmartSearch {
+    -query: string
+    -results: SearchResult[]
+    -loading: boolean
+    +render(): JSX.Element
+    +handleSearch(query: string): Promise<void>
+    +renderResults(): JSX.Element
+    +highlightMatch(text: string, query: string): JSX.Element
+    +clearSearch(): void
+}
+
+class Invitations {
+    -userId: string
+    -userEmail: string
+    -invitations: Invitation[]
+    +render(): JSX.Element
+    +handleAcceptInvitation(invitationId: string): Promise<void>
+    +handleDeclineInvitation(invitationId: string): Promise<void>
+    +sendInvitation(email: string, role: string): Promise<void>
+    +refreshInvitations(): void
+}
+
+class Toast {
+    -toasts: ToastMessage[]
+    +render(): JSX.Element
+    +showToast(message: string, type: ToastType): void
+    +hideToast(toastId: string): void
+    +autoHide(toastId: string, delay: number): void
+}
+
+class Profile {
+    -user: User
+    -isEditing: boolean
+    -formData: UserProfile
+    +render(): JSX.Element
+    +handleEdit(): void
+    +handleSave(): Promise<void>
+    +handleCancel(): void
+    +uploadAvatar(file: File): Promise<string>
+}
+
+' Custom Hooks
+class useAuth {
+    +user: User | null
+    +loading: boolean
+    +signIn(): Promise<void>
+    +logout(): Promise<void>
+    +updateProfile(profile: Partial<User>): Promise<void>
+}
+
+class useProjects {
+    +projects: Project[]
+    +loading: boolean
+    +createProject(name: string, description: string): Promise<void>
+    +deleteProject(projectId: string): Promise<void>
+    +updateProject(projectId: string, updates: Partial<Project>): Promise<void>
+    +addProjectMember(projectId: string, email: string, role: Role): Promise<void>
+    +removeProjectMember(projectId: string, userId: string): Promise<void>
+    +claimInvitations(userId: string, email: string): Promise<void>
+}
+
+class useTasks {
+    +tasks: Task[]
+    +loading: boolean
+    +createTask(task: Partial<Task>): Promise<void>
+    +updateTask(taskId: string, updates: Partial<Task>): Promise<void>
+    +deleteTask(taskId: string): Promise<void>
+    +assignTask(taskId: string, assigneeId: string): Promise<void>
+    +updateTaskProgress(taskId: string, progress: number): Promise<void>
+}
+
+class useComments {
+    +comments: Comment[]
+    +loading: boolean
+    +addComment(content: string): Promise<void>
+    +deleteComment(commentId: string): Promise<void>
+    +editComment(commentId: string, content: string): Promise<void>
+    +getCommentsByTask(taskId: string): Comment[]
+}
+
+class useNotifications {
+    +notifications: Notification[]
+    +markAsRead(notificationId: string): Promise<void>
+    +markAllAsRead(): Promise<void>
+    +createNotification(data: Partial<Notification>): Promise<void>
+    +deleteNotification(notificationId: string): Promise<void>
+}
+
+class useTerminalEvents {
+    +events: TerminalEvent[]
+    +loading: boolean
+    +logEvent(event: Partial<TerminalEvent>): Promise<void>
+    +clearEvents(): Promise<void>
+    +getEventsByType(type: EventType): TerminalEvent[]
+}
+
+class useInvitations {
+    +invitations: Invitation[]
+    +loading: boolean
+    +sendInvitation(email: string, projectId: string, role: string): Promise<void>
+    +acceptInvitation(invitationId: string): Promise<void>
+    +declineInvitation(invitationId: string): Promise<void>
+    +resendInvitation(invitationId: string): Promise<void>
+}
+
+' Interfaces
+interface DashboardProps {
+    +searchQuery?: string
+    +onViewAuditLog?: () => void
+}
+
+interface ProjectsProps {
+    +onSelectProject: (id: string) => void
+    +searchQuery?: string
+}
+
+interface SettingsProps {
+    +user: User
+}
+
+interface TaskModalProps {
+    +isOpen: boolean
+    +task?: Task
+    +mode: 'create' | 'edit'
+    +onClose: () => void
+    +onSubmit: (task: TaskData) => void
+}
+
+interface FileUploaderProps {
+    +onUploadComplete: (fileUrl: string) => void
+    +accept?: string
+    +maxSize?: number
+}
+
+' Component Relationships
+App --> Layout
+App --> Login
+Layout --> Dashboard
+Layout --> Projects
+Layout --> Settings
+Layout --> MissionControl
+Layout --> NeuralNetwork
+Layout --> TerminalLog
+
+Dashboard --> useAuth
+Dashboard --> useProjects
+Dashboard --> useTasks
+Projects --> useAuth
+Projects --> useProjects
+ProjectDetails --> useProjects
+ProjectDetails --> useTasks
+ProjectDetails --> useComments
+
+KanbanBoard --> useTasks
+TaskModal --> useTasks
+FileUploader --> useAuth
+SmartSearch --> useProjects
+Invitations --> useInvitations
+Profile --> useAuth
+
+Dashboard ..|> DashboardProps
+Projects ..|> ProjectsProps
+Settings ..|> SettingsProps
+TaskModal ..|> TaskModalProps
+FileUploader ..|> FileUploaderProps
+
+' Component Composition
+ProjectDetails --> KanbanBoard
+ProjectDetails --> TaskModal
+ProjectDetails --> FileUploader
+Dashboard --> SmartSearch
+Projects --> Toast
+Layout --> Profile
+
+' Data Flow
+useAuth --> User
+useProjects --> Project
+useTasks --> Task
+useComments --> Comment
+useNotifications --> Notification
+useTerminalEvents --> TerminalEvent
+
+@enduml

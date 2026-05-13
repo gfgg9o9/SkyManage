@@ -1,0 +1,148 @@
+@startuml SkyManage Authentication Use Cases
+
+title SkyManage - Authentication System Use Cases
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #LightGreen
+    BorderColor #DarkGreen
+    ArrowColor #DarkGreen
+}
+skinparam rectangle {
+    BackgroundColor #LightYellow
+    BorderColor #Black
+}
+
+' Actors
+actor "Unauthenticated User" as Guest
+actor "Authenticated User" as User
+actor "System Administrator" as Admin
+actor "Firebase Auth" as Firebase
+actor "Email Service" as Email
+
+' System Boundary
+rectangle "Authentication Module" {
+    ' Core Authentication Use Cases
+    usecase "Register Account" as UC1
+    usecase "Login with Email/Password" as UC2
+    usecase "Login with Google" as UC3
+    usecase "Logout" as UC4
+    usecase "Reset Password" as UC5
+    usecase "Change Password" as UC6
+    
+    ' Profile Management
+    usecase "Create Profile" as UC7
+    usecase "Update Profile" as UC8
+    usecase "View Profile" as UC9
+    usecase "Delete Account" as UC10
+    
+    ' Session Management
+    usecase "Refresh Token" as UC11
+    usecase "Validate Session" as UC12
+    usecase "Manage Active Sessions" as UC13
+    
+    ' Security Features
+    usecase "Enable 2FA" as UC14
+    usecase "Verify Email" as UC15
+    usecase "Account Lockout" as UC16
+    usecase "Security Audit" as UC17
+    
+    ' Admin Functions
+    usecase "Manage User Accounts" as UC18
+    usecase "View User Activity" as UC19
+    usecase "Reset User Password" as UC20
+    usecase "Suspend User Account" as UC21
+}
+
+' Guest interactions
+Guest --> UC1
+Guest --> UC2
+Guest --> UC3
+Guest --> UC5
+
+' Authenticated User interactions
+User --> UC4
+User --> UC6
+User --> UC8
+User --> UC9
+User --> UC10
+User --> UC11
+User --> UC13
+User --> UC14
+User --> UC15
+User --> UC17
+
+' Administrator interactions
+Admin --> UC18
+Admin --> UC19
+Admin --> UC20
+Admin --> UC21
+
+' External System interactions
+Firebase --> UC1
+Firebase --> UC2
+Firebase --> UC3
+Firebase --> UC4
+Firebase --> UC11
+Firebase --> UC12
+
+Email --> UC5
+Email --> UC15
+
+' Relationships and Dependencies
+UC1 ..> UC7 : <<include>>
+UC1 ..> UC15 : <<include>>
+UC2 ..> UC12 : <<include>>
+UC3 ..> UC12 : <<include>>
+UC5 ..> UC6 : <<extend>>
+UC16 ..> UC2 : <<extend>>
+
+' Actor Generalizations
+Guest <|-- User
+User <|-- Admin
+
+' Detailed Flow Notes
+note right of UC1
+  - User enters email and password
+  - Firebase creates account
+  - Profile creation triggered
+  - Email verification sent
+end note
+
+note right of UC2
+  - Validates credentials
+  - Creates session token
+  - Updates last login
+  - Redirects to dashboard
+end note
+
+note right of UC5
+  - User requests password reset
+  - Generates secure reset link
+  - Sends email with reset instructions
+  - Link expires after 24 hours
+end note
+
+note left of UC14
+  Optional security feature:
+  - SMS verification
+  - Authenticator app
+  - Backup recovery codes
+end note
+
+note bottom of UC18
+  Admin can:
+  - View all user accounts
+  - Reset passwords
+  - Suspend/unsuspend accounts
+  - View registration data
+end note
+
+' Exception Flows
+note top of UC16
+  Account locked after:
+  - 5 failed login attempts
+  - Suspicious activity detected
+  - Manual admin intervention
+end note
+
+@enduml

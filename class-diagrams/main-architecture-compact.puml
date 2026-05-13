@@ -1,0 +1,205 @@
+@startuml SkyManage Main Architecture
+
+!theme plain
+title SkyManage - Main Architecture
+skinparam class {
+    BackgroundColor #LightBlue
+    BorderColor #DarkBlue
+    ArrowColor #DarkBlue
+    FontSize 8
+}
+
+' Layout for compact display
+page 5x3
+skinparam maxMessageSize 40
+skinparam maxElementSize 40
+
+' === FRONTEND ===
+class App {
+    -state: AppState
+    +render(): JSX
+    +handleTabChange(tab: string): void
+}
+
+class AuthProvider {
+    -user: User | null
+    +signIn(): Promise<void>
+    +logout(): Promise<void>
+}
+
+class Layout {
+    -activeTab: string
+    +renderNavigation(): JSX
+    +handleTabNavigation(tab: string): void
+}
+
+class Dashboard {
+    -projects: Project[]
+    +renderOverview(): JSX
+}
+
+class Projects {
+    -projects: Project[]
+    +renderList(): JSX
+    +createProject(project: Project): void
+}
+
+' === BACKEND ===
+class Server {
+    -app: Express
+    -port: number
+    +start(): void
+    +setupRoutes(): void
+}
+
+class APIRouter {
+    +handleInvite(req: Request): Promise<void>
+    +handleUpload(req: Request): Promise<void>
+    +handleHealthCheck(req: Request): void
+}
+
+class AuthMiddleware {
+    +verifyToken(req: Request): void
+    +checkPermissions(permission: string): void
+}
+
+' === DATABASE ===
+interface IFirestoreService {
+    +connect(): Promise<void>
+    +createDocument(collection: string, data: any): Promise<string>
+    +getDocument(collection: string, id: string): Promise<any>
+}
+
+class FirestoreService {
+    -db: Firestore
+    +connect(): Promise<void>
+    +createDocument(collection: string, data: any): Promise<string>
+    +setupRealtimeListener(collection: string, callback: Function): Unsubscribe
+}
+
+' === EXTERNAL SERVICES ===
+class FirebaseAuthentication {
+    +signInWithPopup(provider: AuthProvider): Promise<UserCredential>
+    +signOut(): Promise<void>
+    +onAuthStateChanged(callback: Function): Unsubscribe
+}
+
+class GoogleGenerativeAI {
+    -apiKey: string
+    +generateText(prompt: string): Promise<string>
+    +analyzeProjectData(data: ProjectData): Promise<AIInsights>
+}
+
+class AWSS3 {
+    -client: S3Client
+    +generateUploadUrl(fileName: string, fileType: string): Promise<string>
+    +uploadFile(key: string, body: Buffer): Promise<UploadResult>
+}
+
+class EmailService {
+    +sendInvitation(email: string, projectData: ProjectData): Promise<void>
+    +sendNotification(email: string, notification: Notification): Promise<void>
+}
+
+' === DATA MODELS ===
+class User {
+    +uid: string
+    +displayName: string
+    +email: string
+    +photoURL?: string
+}
+
+class Project {
+    +id: string
+    +name: string
+    +description: string
+    +ownerId: string
+    +members: string[]
+    +createdAt: string
+}
+
+class Task {
+    +id: string
+    +projectId: string
+    +title: string
+    +status: Status
+    +priority: Priority
+    +assigneeId?: string
+    +progress: number
+}
+
+class Comment {
+    +id: string
+    +taskId: string
+    +authorId: string
+    +content: string
+    +createdAt: string
+}
+
+class Notification {
+    +id: string
+    +userId: string
+    +type: string
+    +message: string
+    +read: boolean
+    +createdAt: string
+}
+
+' === HOOKS ===
+class useAuth {
+    +user: User | null
+    +loading: boolean
+    +signIn(): Promise<void>
+    +logout(): Promise<void>
+}
+
+class useProjects {
+    +projects: Project[]
+    +loading: boolean
+    +createProject(name: string, description: string): Promise<void>
+    +deleteProject(projectId: string): Promise<void>
+    +addProjectMember(projectId: string, email: string): Promise<void>
+}
+
+class useTasks {
+    +tasks: Task[]
+    +loading: boolean
+    +createTask(task: Partial<Task>): Promise<void>
+    +updateTask(taskId: string, updates: Partial<Task>): Promise<void>
+}
+
+' === RELATIONSHIPS ===
+' Frontend flow
+App --> AuthProvider
+App --> Layout
+Layout --> Dashboard
+Layout --> Projects
+
+' Hook connections
+AuthProvider --> FirebaseAuthentication
+Dashboard --> useProjects
+Projects --> useProjects
+useAuth --> FirebaseAuthentication
+useProjects --> FirestoreService
+useTasks --> FirestoreService
+
+' Backend flow
+Server --> APIRouter
+Server --> AuthMiddleware
+APIRouter --> EmailService
+APIRouter --> AWSS3
+APIRouter --> GoogleGenerativeAI
+
+' Database layer
+FirestoreService ..|> IFirestoreService
+FirestoreService --> FirebaseFirestore
+
+' Data model relationships
+Project --> User : "owner"
+Task --> Project : "belongs to"
+Task --> User : "assignee"
+Comment --> Task : "belongs to"
+Comment --> User : "author"
+Notification --> User : "recipient"
+
+@enduml

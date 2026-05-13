@@ -3,7 +3,6 @@ import {
   LayoutDashboard, 
   FolderKanban, 
   LogOut, 
-  Bell, 
   Plus, 
   User as UserIcon,
   Search,
@@ -16,15 +15,15 @@ import {
   ChevronRight,
   Bot,
   Share2,
-  Terminal
+  Terminal,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { useNotifications } from '../hooks/useFirestore';
 import { cn } from '../lib/utils';
-import { motion, AnimatePresence } from 'motion/react';
-import { formatDistanceToNow } from 'date-fns';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import SmartSearch from './SmartSearch';
+import { NotificationPanel } from './NotificationPanel';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -46,16 +45,14 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectProj
   const navItems = [
     { id: 'dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
     { id: 'projects', label: t('nav.projects'), icon: FolderKanban },
+    { id: 'invitations', label: 'Invitations', icon: Bell },
     { id: 'mission_control', label: t('nav.mission_control'), icon: Bot },
     { id: 'neural_network', label: t('nav.neural_network'), icon: Share2 },
     { id: 'live_terminal', label: t('nav.live_terminal'), icon: Terminal },
     { id: 'settings', label: t('nav.parameters'), icon: Settings },
   ];
 
-  const { notifications, markAsRead } = useNotifications(user?.uid);
-  const [isNotifOpen, setIsNotifOpen] = React.useState(false);
-  const unreadCount = notifications.filter(n => !n.read).length;
-
+  
   return (
     <div className="flex h-screen overflow-hidden font-sans text-white">
       {/* Background blobs */}
@@ -211,107 +208,7 @@ export default function Layout({ children, activeTab, setActiveTab, onSelectProj
               </div>
             </div>
             <div className="relative">
-              <button 
-                onClick={() => setIsNotifOpen(!isNotifOpen)}
-                className={cn(
-                  "p-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl relative text-slate-400 transition-all",
-                  isNotifOpen && "bg-white/10 border-white/20 text-white"
-                )}
-              >
-                <Bell size={20} />
-                {unreadCount > 0 && (
-                  <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-sky-500 border-2 border-[#1e293b] rounded-full animate-pulse"></span>
-                )}
-              </button>
-
-              <AnimatePresence>
-                {isNotifOpen && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-40" 
-                      onClick={() => setIsNotifOpen(false)}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-4 w-96 bg-[#1e293b]/95 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden"
-                    >
-                      <div className="p-5 border-b border-white/10 flex items-center justify-between">
-                        <h3 className="font-bold text-lg">Notifications</h3>
-                        {unreadCount > 0 && (
-                          <span className="px-2.5 py-0.5 bg-sky-500/20 text-sky-400 text-[10px] font-black uppercase tracking-wider rounded-full">
-                            {unreadCount} New
-                          </span>
-                        )}
-                      </div>
-                      <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                        {notifications.length === 0 ? (
-                          <div className="p-10 text-center">
-                            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                              <Bell size={24} className="text-slate-600" />
-                            </div>
-                            <p className="text-slate-400 font-medium">All caught up!</p>
-                            <p className="text-xs text-slate-500 mt-1">No new notifications for you.</p>
-                          </div>
-                        ) : (
-                          <div className="divide-y divide-white/5">
-                            {notifications.map((notif) => (
-                              <div 
-                                key={notif.id}
-                                className={cn(
-                                  "p-4 hover:bg-white/5 transition-colors group relative",
-                                  !notif.read && "bg-sky-500/5"
-                                )}
-                              >
-                                <div className="flex gap-4">
-                                  <div className={cn(
-                                    "w-10 h-10 shrink-0 rounded-xl flex items-center justify-center",
-                                    notif.read ? "bg-white/5 text-slate-500" : "bg-sky-500/20 text-sky-400"
-                                  )}>
-                                    <Bell size={18} />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className={cn(
-                                      "text-sm leading-snug mb-1",
-                                      notif.read ? "text-slate-400" : "text-white font-medium"
-                                    )}>
-                                      {notif.message}
-                                    </p>
-                                    <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">
-                                      {formatDistanceToNow(new Date(notif.createdAt))} ago
-                                    </p>
-                                  </div>
-                                  {!notif.read && (
-                                    <button 
-                                      onClick={() => markAsRead(notif.id)}
-                                      className="p-2 opacity-0 group-hover:opacity-100 hover:bg-white/10 rounded-lg text-sky-400 transition-all self-start"
-                                      title="Mark as read"
-                                    >
-                                      <Check size={16} />
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-4 border-t border-white/10 bg-white/5">
-                        <button 
-                          onClick={() => {
-                            setActiveTab('live_terminal');
-                            setIsNotifOpen(false);
-                          }}
-                          className="w-full py-2 text-xs font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-widest"
-                        >
-                          View Activity Log
-                        </button>
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
+              <NotificationPanel />
             </div>
             
             <button 
