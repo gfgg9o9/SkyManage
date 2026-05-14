@@ -69,7 +69,7 @@ export default function ProjectDetails({ projectId, onBack, searchQuery = '' }: 
   
   // Member management state
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState<'admin' | 'pm' | 'member'>('member');
+  const [inviteRole, setInviteRole] = useState<'admin' | 'editor' | 'viewer'>('viewer');
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [isInviting, setIsInviting] = useState(false);
   const [deletingEmail, setDeletingEmail] = useState<string | null>(null);
@@ -367,8 +367,8 @@ export default function ProjectDetails({ projectId, onBack, searchQuery = '' }: 
                         onChange={(e) => setInviteRole(e.target.value as any)}
                         className="p-4 bg-black/20 border border-white/10 rounded-2xl focus:border-sky-500 outline-none transition-all appearance-none cursor-pointer text-white font-black text-[10px] uppercase tracking-widest flex-1"
                       >
-                        <option value="member" className="bg-slate-900">Member Role</option>
-                        <option value="pm" className="bg-slate-900">Project Manager</option>
+                        <option value="viewer" className="bg-slate-900">Viewer Role</option>
+                        <option value="editor" className="bg-slate-900">Editor Role</option>
                         <option value="admin" className="bg-slate-900">Admin Authority</option>
                       </select>
                       <button 

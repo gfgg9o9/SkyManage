@@ -11,7 +11,7 @@ export interface User {
 
 export interface ProjectMember {
   userId?: string;
-  role: 'admin' | 'pm' | 'member';
+  role: 'admin' | 'editor' | 'viewer';
   email: string;
   status: 'active' | 'pending';
   invitedAt?: string;
@@ -24,7 +24,7 @@ export interface Project {
   ownerId: string;
   members: string[]; // Keep this for easy lookup in rules if needed
   admins?: string[];
-  pms?: string[];
+  editors?: string[];
   memberDetails?: ProjectMember[]; // Added for roles and UI
   createdAt: string;
   updatedAt: string;

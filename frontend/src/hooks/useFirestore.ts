@@ -209,6 +209,7 @@ export function useProjects(userId: string | undefined) {
             body: JSON.stringify({
               email: normalizedEmail,
               projectName: projectDoc.name,
+              projectId: projectId, // Pass actual projectId
               role,
               inviterName: auth.currentUser?.displayName || auth.currentUser?.email
             })
@@ -242,8 +243,8 @@ export function useProjects(userId: string | undefined) {
 
         if (role === 'admin') {
           updateData.admins = [...(projectDoc.admins || []), invitedUserId];
-        } else if (role === 'pm') {
-          updateData.pms = [...(projectDoc.pms || []), invitedUserId];
+        } else if (role === 'editor') {
+          updateData.editors = [...(projectDoc.editors || []), invitedUserId];
         }
 
         await updateDoc(projectRef, updateData);
@@ -266,6 +267,7 @@ export function useProjects(userId: string | undefined) {
             body: JSON.stringify({
               email: normalizedEmail,
               projectName: projectDoc.name,
+              projectId: projectId, // Pass actual projectId
               role,
               inviterName: auth.currentUser?.displayName || auth.currentUser?.email
             })
@@ -324,15 +326,15 @@ export function useProjects(userId: string | undefined) {
       const newMemberDetails = currentMemberDetails.filter(m => m.email.toLowerCase().trim() !== normalizedEmailToRemove);
       const newMembers = userIdToRemove ? currentMembers.filter(id => id !== userIdToRemove) : currentMembers;
       const newAdmins = userIdToRemove ? (projectData.admins || []).filter(id => id !== userIdToRemove) : (projectData.admins || []);
-      const newPms = userIdToRemove ? (projectData.pms || []).filter(id => id !== userIdToRemove) : (projectData.pms || []);
+      const newEditors = userIdToRemove ? (projectData.editors || []).filter(id => id !== userIdToRemove) : (projectData.editors || []);
 
-      console.log('Updating project with:', { newMembers, newMemberDetails, newAdmins, newPms });
+      console.log('Updating project with:', { newMembers, newMemberDetails, newAdmins, newEditors });
 
       await updateDoc(projectRef, {
         members: newMembers,
         memberDetails: newMemberDetails,
         admins: newAdmins,
-        pms: newPms,
+        editors: newEditors,
         updatedAt: new Date().toISOString()
       });
       console.log('Update successful');

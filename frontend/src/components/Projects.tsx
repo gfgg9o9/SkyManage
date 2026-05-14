@@ -9,7 +9,9 @@ import {
   ArrowUpRight,
   Loader2,
   FolderOpen,
-  Trash2
+  Trash2,
+  Crown,
+  Mail
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '../lib/utils';
@@ -116,19 +118,51 @@ export default function Projects({ onSelectProject, searchQuery = '' }: Projects
                 <div className="w-14 h-14 bg-sky-500/10 rounded-2xl flex items-center justify-center text-sky-400 border border-sky-500/20 shadow-inner group-hover:bg-sky-500 group-hover:text-white transition-all duration-500">
                   <FolderOpen size={28} />
                 </div>
-                <div className="relative">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setMenuOpenId(menuOpenId === project.id ? null : project.id);
-                    }}
-                    className={cn(
-                      "p-3 rounded-xl transition-all",
-                      menuOpenId === project.id ? "bg-white/10 text-white" : "text-slate-500 hover:text-white hover:bg-white/5"
-                    )}
-                  >
-                    <MoreVertical size={20} />
-                  </button>
+                <div className="flex items-center gap-2">
+                  {/* Ownership Badge */}
+                  {(() => {
+                    console.log('Project:', project.name, 'ownerId:', project.ownerId, 'user.uid:', user?.uid, 'match:', project.ownerId === user?.uid);
+                    console.log('MemberDetails:', project.memberDetails);
+                    return project.ownerId === user?.uid ? (
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                      <Crown size={12} className="text-amber-400" />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">Owner</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+                      <Mail size={12} className="text-emerald-400" />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">Invited</span>
+                    </div>
+                  );
+                  })()}
+                  {/* Role Badge */}
+                  {(() => {
+                    const member = project.memberDetails?.find((m: any) => m.userId === user?.uid);
+                    if (!member) return null;
+                    const roleColors = {
+                      admin: 'bg-purple-500/10 border-purple-500/30 text-purple-400',
+                      editor: 'bg-sky-500/10 border-sky-500/30 text-sky-400',
+                      viewer: 'bg-slate-500/10 border-slate-500/30 text-slate-400'
+                    };
+                    return (
+                      <div className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-lg ${roleColors[member.role as keyof typeof roleColors]}`}>
+                        <span className="text-[10px] font-black uppercase tracking-wider">{member.role}</span>
+                      </div>
+                    );
+                  })()}
+                  <div className="relative">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMenuOpenId(menuOpenId === project.id ? null : project.id);
+                      }}
+                      className={cn(
+                        "p-3 rounded-xl transition-all",
+                        menuOpenId === project.id ? "bg-white/10 text-white" : "text-slate-500 hover:text-white hover:bg-white/5"
+                      )}
+                    >
+                      <MoreVertical size={20} />
+                    </button>
 
                   {menuOpenId === project.id && (
                     <>
@@ -154,6 +188,7 @@ export default function Projects({ onSelectProject, searchQuery = '' }: Projects
                     </>
                   )}
                 </div>
+              </div>
               </div>
               <h3 className="text-2xl font-bold mb-3 group-hover:text-sky-400 transition-colors uppercase tracking-tighter leading-none">{project.name}</h3>
               <p className="text-slate-400 text-sm line-clamp-2 mb-8 leading-relaxed">

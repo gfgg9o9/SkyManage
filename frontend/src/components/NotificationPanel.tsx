@@ -16,37 +16,23 @@ interface Notification {
 
 export const NotificationPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const { acceptInvitation, declineInvitation } = useInvitations(auth.currentUser?.uid, auth.currentUser?.email);
+  const { invitations, loading, acceptInvitation, declineInvitation } = useInvitations(auth.currentUser?.uid, auth.currentUser?.email);
 
-  // Mock notifications - in real app, these would come from Firestore
-  const [mockNotifications, setMockNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      type: 'invitation',
-      title: 'Project Invitation',
-      message: 'You have been added to project: ggfgf',
-      timestamp: new Date(),
-      isRead: false,
-      invitationId: 'inv_123'
-    },
-    {
-      id: '2',
-      type: 'task_assigned',
-      title: 'New Task Assigned',
-      message: 'You have been assigned a new task in Project Alpha',
-      timestamp: new Date(Date.now() - 3600000),
-      isRead: true
-    }
-  ]);
-
-  const allNotifications = [...mockNotifications, ...notifications];
+  // Convert invitations to notification format
+  const notifications: Notification[] = invitations.map(inv => ({
+    id: inv.id,
+    type: 'invitation' as const,
+    title: 'Project Invitation',
+    message: `You have been invited to project: ${inv.projectName}`,
+    timestamp: inv.createdAt,
+    isRead: false,
+    invitationId: inv.id
+  }));
 
   const handleAcceptInvitation = async (invitationId: string) => {
     try {
       await acceptInvitation(invitationId);
-      // Remove the notification after accepting
-      setMockNotifications(prev => prev.filter(n => n.invitationId !== invitationId));
+      // Force refresh invitations after accepting
       setIsOpen(false); // Close panel after action
     } catch (error) {
       console.error('Failed to accept invitation:', error);
@@ -56,8 +42,7 @@ export const NotificationPanel: React.FC = () => {
   const handleDeclineInvitation = async (invitationId: string) => {
     try {
       await declineInvitation(invitationId);
-      // Remove the notification after declining
-      setMockNotifications(prev => prev.filter(n => n.invitationId !== invitationId));
+      // Force refresh invitations after declining
       setIsOpen(false); // Close panel after action
     } catch (error) {
       console.error('Failed to decline invitation:', error);
@@ -65,16 +50,16 @@ export const NotificationPanel: React.FC = () => {
   };
 
   const handleMarkAsRead = (notificationId: string) => {
-    setMockNotifications(prev => 
-      prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n)
-    );
+    // Mark as read functionality - would update Firestore in production
+    console.log('Mark notification as read:', notificationId);
   };
 
   const handleDismiss = (notificationId: string) => {
-    setMockNotifications(prev => prev.filter(n => n.id !== notificationId));
+    // Dismiss functionality - would update Firestore in production
+    console.log('Dismiss notification:', notificationId);
   };
 
-  const unreadCount = allNotifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
     <div className="relative">
@@ -112,13 +97,17 @@ export const NotificationPanel: React.FC = () => {
 
           {/* Notifications List */}
           <div className="max-h-96 overflow-y-auto p-4">
-            {allNotifications.length === 0 ? (
+            {loading ? (
+              <div className="text-center py-8 text-gray-500">
+                <p>Loading invitations...</p>
+              </div>
+            ) : notifications.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <Bell size={32} className="mx-auto mb-2 text-gray-300" />
-                <p>No notifications</p>
+                <p>No invitations</p>
               </div>
             ) : (
-              allNotifications.map((notification) => (
+              notifications.map((notification) => (
                 <NotificationItem
                   key={notification.id}
                   id={notification.id}
