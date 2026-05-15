@@ -1,12 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import { useTerminalEvents } from '../hooks/useFirestore';
+import { useAuth } from '../hooks/useAuth';
+import { useProjects } from '../hooks/useFirestore';
 import { motion, AnimatePresence } from 'motion/react';
 import { Terminal, Cpu, ShieldCheck, Activity } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { format } from 'date-fns';
 
 export default function TerminalLog() {
-  const { events, loading } = useTerminalEvents();
+  const { user } = useAuth();
+  const { projects } = useProjects(user?.uid);
+  const userProjectIds = projects.map(p => p.id);
+  const { events, loading } = useTerminalEvents(user?.uid, userProjectIds);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

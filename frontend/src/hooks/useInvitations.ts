@@ -150,15 +150,14 @@ export function useInvitations(userId: string | null, userEmail: string | null) 
 
   const declineInvitation = async (invitationId: string) => {
     try {
-      // Use temporary API endpoint instead of Firestore
+      // Use DELETE endpoint to remove the invitation
       console.log('Declining invitation via API:', invitationId);
       
-      const response = await fetch(`/api/invitations/${invitationId}/update`, {
-        method: 'POST',
+      const response = await fetch(`/api/invitations/${invitationId}`, {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: 'declined' }),
       });
 
       if (!response.ok) {
@@ -166,7 +165,7 @@ export function useInvitations(userId: string | null, userEmail: string | null) 
       }
 
       const result = await response.json();
-      console.log('Invitation declined successfully via API:', result);
+      console.log('Invitation declined and deleted successfully via API:', result);
 
       // Refresh invitations to remove the declined one from the list
       await fetchInvitations();

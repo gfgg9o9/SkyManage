@@ -79,6 +79,7 @@ export default function ProjectDetails({ projectId, onBack, searchQuery = '' }: 
   const [taskDesc, setTaskDesc] = useState('');
   const [taskPriority, setTaskPriority] = useState<Priority>('medium');
   const [taskDueDate, setTaskDueDate] = useState('');
+  const [taskAssigneeId, setTaskAssigneeId] = useState<string>('');
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,13 +125,14 @@ export default function ProjectDetails({ projectId, onBack, searchQuery = '' }: 
         status: newTaskStatus,
         priority: taskPriority,
         reporterId: user?.uid || 'unknown',
-        assigneeId: user?.uid || 'unknown',
+        assigneeId: taskAssigneeId || user?.uid || 'unknown',
         dueDate: taskDueDate || undefined
       });
       showToast("Task deployment executed successfully.", "success");
       setTaskTitle('');
       setTaskDesc('');
       setTaskDueDate('');
+      setTaskAssigneeId('');
       setIsAddTaskOpen(false);
     } catch (err: any) {
       showToast("Deployment failed.", "error");
@@ -220,7 +222,7 @@ export default function ProjectDetails({ projectId, onBack, searchQuery = '' }: 
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-auto">
         {view === 'grid' ? (
           <KanbanBoard 
             tasks={filteredTasks} 
@@ -568,6 +570,21 @@ export default function ProjectDetails({ projectId, onBack, searchQuery = '' }: 
                       className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl focus:border-sky-500 focus:bg-white/10 outline-none transition-all text-white font-medium"
                     />
                   </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-black text-slate-500 mb-2 tracking-widest">Assign To</label>
+                  <select 
+                    value={taskAssigneeId}
+                    onChange={(e) => setTaskAssigneeId(e.target.value)}
+                    className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl focus:border-sky-500 focus:bg-white/10 outline-none transition-all appearance-none cursor-pointer text-white font-medium"
+                  >
+                    <option value="" className="bg-slate-900">Unassigned</option>
+                    {project.memberDetails?.map((member: ProjectMember) => (
+                      <option key={member.userId || member.email} value={member.userId || ''} className="bg-slate-900">
+                        {member.email} ({member.role})
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="flex gap-4 pt-8">
                   <button 

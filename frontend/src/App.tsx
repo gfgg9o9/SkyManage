@@ -19,13 +19,6 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const { claimInvitations } = useProjects(user?.uid);
-
-  useEffect(() => {
-    if (user?.uid && user?.email) {
-      claimInvitations(user.uid, user.email);
-    }
-  }, [user]);
 
   if (loading) {
     return (

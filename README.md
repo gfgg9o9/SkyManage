@@ -125,3 +125,63 @@ The backend provides the following API endpoints:
 - Backend runs on port 3001
 - Frontend proxies `/api/*` requests to backend
 - Firebase configuration is in `frontend/firebase-applet-config.json`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. Mock vs Real Data Confusion:
+
+Problem: NotificationPanel mixes mock notifications with real invitations
+Impact: Users see fake invitations that don't work
+Fix: Remove mock notifications, only show real invitations from API
+2. No Real Project Integration:
+
+Problem: Accepting invitations doesn't add users to actual projects
+Impact: Users can't access projects after accepting
+Fix: Implement project member addition in acceptInvitation function
+3. Temporary Storage Issues:
+
+Problem: Backend uses in-memory storage (lost on restart)
+Impact: All invitations disappear when server restarts
+Fix: Deploy Firestore rules or implement persistent storage
+4. Role System Mismatch:
+
+Problem: Current roles are member | pm | admin but you want editor | viewer | admin
+Impact: Role system doesn't match your requirements
+Fix: Update role types throughout the system
+5. Email Configuration Missing:
+
+Problem: Email credentials not configured in .env
+Impact: Email sending fails or uses simulation mode
+Fix: Add EMAIL_USER, EMAIL_PASS, EMAIL_FROM to .env
+6. Project ID Issues:
+
+Problem: Backend creates temporary project IDs (temp_${Date.now()})
+Impact: Invitations link to non-existent projects
+Fix: Pass actual projectId from frontend to backend
+7. Notification Sync Issues:
+
+Problem: Notifications don't sync with invitation status changes
+Impact: Old notifications remain after accepting/declining
+Fix: Refresh notifications after status updates
+8. Field Name Inconsistencies:
+
+Problem: Backend uses inviteeEmail, frontend expects recipientEmail
+Impact: Data mapping required, potential for errors
+Fix: Standardize field names across backend and frontend

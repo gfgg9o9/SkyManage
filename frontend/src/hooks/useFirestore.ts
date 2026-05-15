@@ -167,7 +167,7 @@ export function useProjects(userId: string | undefined) {
     }
   };
 
-  const addProjectMember = async (projectId: string, email: string, role: 'admin' | 'pm' | 'member') => {
+  const addProjectMember = async (projectId: string, email: string, role: 'admin' | 'pm' | 'editor' | 'member' | 'viewer') => {
     // 1. Initial check on local state to avoid unnecessary DB calls/scary errors
     const projectDoc = projects.find(p => p.id === projectId);
     if (!projectDoc) return;
@@ -243,7 +243,7 @@ export function useProjects(userId: string | undefined) {
 
         if (role === 'admin') {
           updateData.admins = [...(projectDoc.admins || []), invitedUserId];
-        } else if (role === 'editor') {
+        } else if (role === 'pm' || role === 'editor') {
           updateData.editors = [...(projectDoc.editors || []), invitedUserId];
         }
 
@@ -338,6 +338,22 @@ export function useProjects(userId: string | undefined) {
         updatedAt: new Date().toISOString()
       });
       console.log('Update successful');
+
+      // Notify the removed user
+      if (userIdToRemove) {
+        try {
+          await addDoc(collection(db, 'notifications'), {
+            userId: userIdToRemove,
+            type: 'project_removed',
+            message: `You have been removed from project: ${projectData.name}`,
+            projectId: projectId,
+            read: false,
+            createdAt: new Date().toISOString()
+          });
+        } catch (notifError) {
+          console.warn('Failed to send removal notification:', notifError);
+        }
+      }
     } catch (error) {
       console.error('Error in removeProjectMember:', error);
       handleFirestoreError(error, OperationType.WRITE, `projects/${projectId}/members`);
@@ -652,7 +668,7 @@ export function useNotifications(userId: string | undefined) {
   return { notifications, markAsRead, createNotification };
 }
 
-export function useTerminalEvents() {
+export function useTerminalEvents(userId: string | undefined, userProjectIds: string[] = []) {
   const [events, setEvents] = useState<TerminalEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -676,14 +692,26 @@ export function useTerminalEvents() {
           createdAt: createdAt || new Date().toISOString()
         } as TerminalEvent;
       });
-      setEvents(eventsData);
+
+      // Filter events: show events for current user OR events for user's projects
+      const filteredEvents = eventsData.filter(event => {
+        // Show if it's the current user's action
+        if (event.userId === userId) return true;
+        
+        // Show if it's related to one of the user's projects
+        if (event.projectId && userProjectIds.includes(event.projectId)) return true;
+        
+        return false;
+      });
+
+      setEvents(filteredEvents);
       setLoading(false);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'terminal_events');
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [userId, userProjectIds]);
 
   return { events, loading };
 }

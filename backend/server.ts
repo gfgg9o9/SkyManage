@@ -296,6 +296,54 @@ async function startServer() {
     }
   });
 
+  // Invitation delete endpoint - delete from MongoDB
+  app.delete("/api/invitations/:id", async (req, res) => {
+    const invitationId = req.params.id;
+    
+    console.log("[API] Deleting invitation:", invitationId);
+    
+    try {
+      const client = await getMongoClient();
+      if (client && dbConnected) {
+        const db = client.db("skymanage_system");
+        const invitationsCollection = db.collection("invitations");
+        const result = await invitationsCollection.deleteOne({ id: invitationId });
+        
+        if (result.deletedCount === 0) {
+          return res.status(404).json({ error: "Invitation not found" });
+        }
+        
+        console.log("[API] Invitation deleted successfully from MongoDB");
+        res.json({ success: true, message: "Invitation deleted" });
+      } else {
+        // Fallback to in-memory storage
+        console.warn("[API] MongoDB not available, using in-memory fallback");
+        if (!(globalThis as any).invitations) {
+          return res.status(404).json({ error: "Invitation not found" });
+        }
+        const index = (globalThis as any).invitations.findIndex((inv: any) => inv.id === invitationId);
+        if (index === -1) {
+          return res.status(404).json({ error: "Invitation not found" });
+        }
+        (globalThis as any).invitations.splice(index, 1);
+        console.log("[API] Invitation deleted successfully from memory");
+        res.json({ success: true, message: "Invitation deleted" });
+      }
+    } catch (error) {
+      console.error("[API] Error deleting invitation:", error);
+      // Fallback to in-memory storage
+      if (!(globalThis as any).invitations) {
+        return res.status(404).json({ error: "Invitation not found" });
+      }
+      const index = (globalThis as any).invitations.findIndex((inv: any) => inv.id === invitationId);
+      if (index === -1) {
+        return res.status(404).json({ error: "Invitation not found" });
+      }
+      (globalThis as any).invitations.splice(index, 1);
+      res.json({ success: true, message: "Invitation deleted" });
+    }
+  });
+
   // Health check
   app.get("/api/health", (req, res) => {
     res.json({ 

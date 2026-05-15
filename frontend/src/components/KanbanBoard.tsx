@@ -13,7 +13,8 @@ import {
   Flag,
   User as UserIcon,
   MessageSquare,
-  Trash2
+  Trash2,
+  GripVertical
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -26,12 +27,6 @@ interface KanbanBoardProps {
   onAddTask: (status: Status) => void;
   onTaskClick: (task: Task) => void;
 }
-
-const COLUMNS: { id: Status; title: string; color: string; accent: string }[] = [
-  { id: 'todo', title: 'To Do', color: 'bg-slate-400', accent: 'text-slate-400' },
-  { id: 'in_progress', title: 'In Progress', color: 'bg-amber-500', accent: 'text-amber-500' },
-  { id: 'done', title: 'Done', color: 'bg-emerald-500', accent: 'text-emerald-500' },
-];
 
 const PRIORITY_COLORS: Record<Priority, string> = {
   low: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
@@ -69,7 +64,7 @@ export default function KanbanBoard({ tasks, onUpdateTask, onDeleteTask, onAddTa
           const columnTasks = tasks.filter((t) => t.status === column.id);
 
           return (
-            <div key={column.id} className="flex flex-col w-84 shrink-0 bg-white/5 backdrop-blur-md rounded-[32px] p-5 border border-white/5">
+            <div key={column.id} className="flex flex-col w-[350px] shrink-0 bg-white/5 rounded-[32px] p-5 border border-white/5">
               <div className="flex items-center justify-between mb-6 px-2">
                 <div className="flex items-center gap-3">
                   <div className={cn("w-2 h-2 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)]", column.color)} />
@@ -94,8 +89,8 @@ export default function KanbanBoard({ tasks, onUpdateTask, onDeleteTask, onAddTa
                     {...provided.droppableProps}
                     ref={provided.innerRef}
                     className={cn(
-                      "flex-1 min-h-[200px] transition-colors rounded-2xl space-y-4 pt-1",
-                      snapshot.isDraggingOver && "bg-sky-500/5 ring-1 ring-inset ring-sky-500/10"
+                      "flex-1 min-h-[200px] transition-all duration-200 rounded-2xl space-y-4 pt-1",
+                      snapshot.isDraggingOver && "bg-sky-500/10 ring-2 ring-inset ring-sky-500/30"
                     )}
                   >
                     {columnTasks.map((task, index) => (
@@ -104,28 +99,31 @@ export default function KanbanBoard({ tasks, onUpdateTask, onDeleteTask, onAddTa
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
-                            {...provided.dragHandleProps}
                             style={provided.draggableProps.style}
-                            className={cn(
-                              "bg-white/5 backdrop-blur-sm p-5 rounded-2xl border border-white/5 shadow-xl transition-all group active:scale-[0.98] text-left cursor-default",
-                              snapshot.isDragging ? "bg-white/15 shadow-2xl border-sky-500/30 ring-2 ring-sky-500/20 scale-105 z-50" : "hover:bg-white/10 hover:border-white/20"
-                            )}
-                            onClick={(e) => {
-                              // If they clicked the menu button, don't open details
-                              if ((e.target as HTMLElement).closest('button')) return;
-                              onTaskClick(task);
-                            }}
+                            className="bg-white/5 p-5 rounded-2xl border border-white/5 group text-left hover:border-white/10 transition-all cursor-pointer"
+                            onClick={() => onTaskClick(task)}
                           >
                             <div className="flex items-start justify-between mb-4">
-                              <span className={cn(
-                                "px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border",
-                                PRIORITY_COLORS[task.priority]
-                              )}>
-                                {task.priority}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="p-1 text-slate-500 cursor-grab active:cursor-grabbing hover:text-sky-400 transition-colors"
+                                  {...provided.dragHandleProps}
+                                >
+                                  <GripVertical size={14} />
+                                </div>
+                                <span className={cn(
+                                  "px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border",
+                                  PRIORITY_COLORS[task.priority]
+                                )}>
+                                  {task.priority}
+                                </span>
+                              </div>
                               <div className="relative">
                                 <button 
-                                  onClick={() => setTaskMenuOpenId(taskMenuOpenId === task.id ? null : task.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setTaskMenuOpenId(taskMenuOpenId === task.id ? null : task.id);
+                                  }}
                                   className={cn(
                                     "p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-lg transition-all",
                                     taskMenuOpenId === task.id ? "opacity-100 bg-white/10" : "opacity-0 group-hover:opacity-100"

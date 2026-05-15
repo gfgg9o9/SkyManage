@@ -11,7 +11,7 @@ export interface User {
 
 export interface ProjectMember {
   userId?: string;
-  role: 'admin' | 'editor' | 'viewer';
+  role: 'admin' | 'pm' | 'editor' | 'member' | 'viewer';
   email: string;
   status: 'active' | 'pending';
   invitedAt?: string;

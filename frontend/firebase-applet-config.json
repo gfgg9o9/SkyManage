@@ -1,10 +1,9 @@
 {
-  "projectId": "gen-lang-client-0229470974",
-  "appId": "1:234810679207:web:47a990a547f11f72182082",
-  "apiKey": "AIzaSyDbFXcyCFxWrwoLCkx7YgAT8niTY_eB8AI",
-  "authDomain": "gen-lang-client-0229470974.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-317066f4-f6a2-4231-90ea-d595e2e1a032",
-  "storageBucket": "gen-lang-client-0229470974.firebasestorage.app",
-  "messagingSenderId": "234810679207",
-  "measurementId": ""
+  "projectId": "skymanage-26296",
+  "appId": "1:464285285211:web:52386c09e27a948daaf87e",
+  "apiKey": "AIzaSyBw1xaNBSQYylKYaCZ6YE-7w3Nsk6a-S8E",
+  "authDomain": "skymanage-26296.firebaseapp.com",
+  "storageBucket": "skymanage-26296.firebasestorage.app",
+  "messagingSenderId": "464285285211",
+  "measurementId": "G-P4FL33JMKF"
 }

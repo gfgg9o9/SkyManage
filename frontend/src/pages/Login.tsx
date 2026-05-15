@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { useAuth } from '../hooks/useAuth';
 import { 
@@ -13,11 +13,39 @@ import {
   CheckCircle2, 
   ArrowRight,
   Database,
-  BarChart3
+  BarChart3,
+  Mail,
+  Lock,
+  User
 } from 'lucide-react';
 
 export default function Login() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithEmail, signUpWithEmail } = useAuth();
+  const [authMethod, setAuthMethod] = useState<'google' | 'email'>('google');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      if (isSignUp) {
+        await signUpWithEmail(email, password, displayName);
+      } else {
+        await signInWithEmail(email, password);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Authentication failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-sky-500/30 overflow-x-hidden">
@@ -59,15 +87,108 @@ export default function Login() {
                 The next-generation cloud-native workspace for high-performance engineering teams.
               </p>
             </div>
-            <div className="pt-6 flex flex-col sm:flex-row gap-6">
-              <button 
-                onClick={signIn}
-                className="flex items-center justify-center gap-4 bg-white text-slate-900 px-10 py-6 rounded-3xl font-black text-xl hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:scale-[1.03] active:scale-95 transition-all shadow-2xl group"
-              >
-                <img src="https://www.google.com/favicon.ico" alt="" className="w-6 h-6" />
-                AUTHENTICATE
-                <ArrowRight className="group-hover:translate-x-2 transition-transform" />
-              </button>
+            <div className="pt-6 flex flex-col gap-6">
+              {/* Auth Method Toggle */}
+              <div className="flex gap-4 p-1 bg-white/5 rounded-2xl w-fit">
+                <button
+                  onClick={() => setAuthMethod('google')}
+                  className={`px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all ${
+                    authMethod === 'google' 
+                      ? 'bg-sky-500 text-white' 
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Google
+                </button>
+                <button
+                  onClick={() => setAuthMethod('email')}
+                  className={`px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all ${
+                    authMethod === 'email' 
+                      ? 'bg-sky-500 text-white' 
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Email
+                </button>
+              </div>
+
+              {/* Google Auth */}
+              {authMethod === 'google' && (
+                <button 
+                  onClick={signIn}
+                  className="flex items-center justify-center gap-4 bg-white text-slate-900 px-10 py-6 rounded-3xl font-black text-xl hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:scale-[1.03] active:scale-95 transition-all shadow-2xl group"
+                >
+                  <img src="https://www.google.com/favicon.ico" alt="" className="w-6 h-6" />
+                  AUTHENTICATE
+                  <ArrowRight className="group-hover:translate-x-2 transition-transform" />
+                </button>
+              )}
+
+              {/* Email/Password Auth */}
+              {authMethod === 'email' && (
+                <form onSubmit={handleEmailAuth} className="space-y-4">
+                  {isSignUp && (
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                      <input
+                        type="text"
+                        placeholder="Display Name"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:border-sky-500 focus:bg-white/10 outline-none transition-all placeholder-slate-500 font-medium"
+                        required
+                      />
+                    </div>
+                  )}
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:border-sky-500 focus:bg-white/10 outline-none transition-all placeholder-slate-500 font-medium"
+                      required
+                    />
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <input
+                      type="password"
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:border-sky-500 focus:bg-white/10 outline-none transition-all placeholder-slate-500 font-medium"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                  
+                  {error && (
+                    <p className="text-red-400 text-sm font-medium">{error}</p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full flex items-center justify-center gap-4 bg-sky-500 text-white px-10 py-6 rounded-3xl font-black text-xl hover:shadow-[0_0_40px_rgba(14,165,233,0.4)] hover:scale-[1.03] active:scale-95 transition-all shadow-2xl group disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'PROCESSING...' : isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}
+                    <ArrowRight className="group-hover:translate-x-2 transition-transform" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSignUp(!isSignUp);
+                      setError('');
+                    }}
+                    className="w-full text-slate-400 hover:text-white text-sm font-medium transition-colors"
+                  >
+                    {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+                  </button>
+                </form>
+              )}
             </div>
             <div className="grid grid-cols-3 gap-12 pt-12 border-t border-white/10">
                <div className="space-y-1">
